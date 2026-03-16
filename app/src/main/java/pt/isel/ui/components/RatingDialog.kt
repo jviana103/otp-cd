@@ -21,13 +21,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import pt.isel.datascan.viewmodel.state.DEFAULT_SUBJ_RATING
 
 @Composable
 fun RatingDialog(
+    initialRating: Int = DEFAULT_SUBJ_RATING,
     onConfirm: (Int) -> Unit,
     onDismiss: () -> Unit
 ) {
-    var selectedRating by remember { mutableStateOf(3) } // Default to middle value
+    var selectedRating by remember { mutableStateOf(initialRating) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -37,7 +39,6 @@ fun RatingDialog(
                 Text("Como classificaria a ocupação atual?")
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Simple Row of numbers for rating
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly
@@ -77,6 +78,7 @@ fun RatingDialog(
 @Composable
 fun RatingDialogPreview() {
     RatingDialog(
+        initialRating = DEFAULT_SUBJ_RATING,
         onConfirm = {},
         onDismiss = {}
     )

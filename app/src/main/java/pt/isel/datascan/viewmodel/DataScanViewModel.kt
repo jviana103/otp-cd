@@ -2,6 +2,7 @@ package pt.isel.datascan.viewmodel
 
 import android.content.Context
 import android.content.Intent
+import android.location.Location
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,6 +13,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import pt.isel.datascan.domain.ScanReading
 import pt.isel.datascan.viewmodel.state.DEFAULT_INTERVAL
 import pt.isel.datascan.viewmodel.state.DEFAULT_TIMEOUT
 import pt.isel.datascan.viewmodel.state.DataScanUiState
@@ -34,10 +36,33 @@ class DataScanViewModel : ViewModel() {
                 _uiState.update { it.copy(isRiding = running) }
             }
         }
+        viewModelScope.launch {
+            RideService.currentLocation.collect { location ->
+                _uiState.update {
+                    it.copy(
+                        lastRead =
+                            ScanReading(
+                                latitude = location?.latitude ?: 0.0,
+                                longitude = location?.longitude ?: 0.0
+                            )
+                    )
+                }
+            }
+        }
+        viewModelScope.launch {
+            RideService.currentBluetoothCount.collect { count ->
+                _uiState.update { it.copy(
+                    lastRead = it.lastRead?.copy(bluetoothCount = count)) }
+            }
+        }
     }
 
     fun startRide() {
         _uiState.update { it.copy(isAwaitingInitialRating = true) }
+    }
+
+    fun cancelStart() {
+        _uiState.update { it.copy(isAwaitingInitialRating = false) }
     }
 
     fun confirmInitialRating(context: Context, rating: Int) {

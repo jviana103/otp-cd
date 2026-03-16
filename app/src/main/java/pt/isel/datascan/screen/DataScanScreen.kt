@@ -89,6 +89,10 @@ fun DataScanScreen(
 
                 Text("Ocupação atual: ${state.currentSubjectiveRating}")
 
+                Text("Dispositivos Bluetooth: ${state.lastRead?.bluetoothCount}")
+
+                Text("Localização atual: ${state.lastRead?.latitude}, ${state.lastRead?.longitude}")
+
                 Button(
                     onClick = { showUpdateDialog = true },
                     modifier = Modifier.padding(top = 8.dp)
@@ -110,6 +114,7 @@ fun DataScanScreen(
 
         if (showUpdateDialog) {
             RatingDialog(
+                initialRating = state.currentSubjectiveRating,
                 onConfirm = { newRating ->
                     viewModel.updateOngoingRating(context, newRating)
                     showUpdateDialog = false
@@ -121,7 +126,10 @@ fun DataScanScreen(
         if (state.isAwaitingInitialRating) {
             RatingDialog(
                 onConfirm = onStartService,
-                onDismiss = {  }
+                onDismiss = {
+                    viewModel.cancelStart()
+                    showUpdateDialog = false;
+                }
             )
         }
     }

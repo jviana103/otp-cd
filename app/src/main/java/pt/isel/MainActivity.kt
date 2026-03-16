@@ -49,10 +49,10 @@ class MainActivity : ComponentActivity() {
                 LaunchedEffect(Unit) {
                     permissionLauncher.launch(
                         arrayOf(
-                            android.Manifest.permission.POST_NOTIFICATIONS,
-                            android.Manifest.permission.ACCESS_FINE_LOCATION,
-                            android.Manifest.permission.BLUETOOTH_SCAN,
-                            android.Manifest.permission.BLUETOOTH_CONNECT
+                            Manifest.permission.POST_NOTIFICATIONS,
+                            Manifest.permission.ACCESS_FINE_LOCATION,
+                            Manifest.permission.BLUETOOTH_SCAN,
+                            Manifest.permission.BLUETOOTH_CONNECT
                         )
                     )
                 }
