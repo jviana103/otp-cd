@@ -47,7 +47,7 @@ class FirestoreRepository(
             "qtd_dispositivos_bluetooth" to reading.bluetoothCount,
             "qtd_access_points" to reading.wifiCount,
             "intensidade_sinal_5_ap" to reading.signalIntensities,
-            "localizacao" to GeoPoint(reading.latitude, reading.longitude),
+            "localizacao" to GeoPoint(reading.latitude ?: 0.0, reading.longitude ?: 0.0),
             "latencia" to reading.latency,
             "perda_pacotes" to 0.0,
             "avaliacao_subjetiva" to reading.subjectiveRating

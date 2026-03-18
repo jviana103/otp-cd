@@ -9,6 +9,7 @@ import android.app.Service
 import android.content.Context
 import android.content.Intent
 import android.location.Location
+import android.net.wifi.ScanResult
 import android.os.IBinder
 import android.util.Log
 import androidx.core.app.NotificationCompat
@@ -28,10 +29,13 @@ import kotlin.time.Duration.Companion.seconds
 
 class RideService() : Service() {
     private lateinit var locationService: LocationService
+
     private lateinit var bluetoothService: BluetoothService
 
+    private lateinit var wifiService: WifiService
+
     private val firestoreRepository = FirestoreRepository()
-    
+
     private val serviceJob = Job()
     private val serviceScope = CoroutineScope(Dispatchers.Main + serviceJob)
 
@@ -40,6 +44,8 @@ class RideService() : Service() {
         val isServiceRunning = MutableStateFlow(false)
         val currentLocation = MutableStateFlow<Location?>(null)
         val currentBluetoothCount = MutableStateFlow(0)
+        val currentWifiCount = MutableStateFlow(0)
+        val currentScanResults = MutableStateFlow<List<ScanResult>>(emptyList())
     }
 
     override fun onCreate() {
@@ -56,6 +62,12 @@ class RideService() : Service() {
                 currentBluetoothCount.value = count
             }
         }
+        wifiService = WifiService(this)
+        serviceScope.launch {
+            wifiService.wifiCount.collect { count ->
+                currentWifiCount.value = count
+            }
+        }
     }
 
     private var currentRating = DEFAULT_SUBJ_RATING
@@ -70,13 +82,14 @@ class RideService() : Service() {
                 val transportType = intent?.getStringExtra("TRANSPORT_TYPE") ?: "Unknown"
                 currentRating = intent?.getIntExtra("RATING", DEFAULT_SUBJ_RATING)
                     ?: DEFAULT_SUBJ_RATING
-                
+
                 startForeground(1, createNotificationWithTime(DEFAULT_TIMEOUT))
 
                 firestoreRepository.createTrip(tripId = tripId, transportType = transportType)
 
                 locationService.startLocationUpdates()
                 bluetoothService.startScan()
+                wifiService.startScan()
 
                 startRideTicker(tripId)
             }
@@ -93,7 +106,6 @@ class RideService() : Service() {
                 val updatedNotification = createNotificationWithTime(seconds)
                 val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
                 manager.notify(1, updatedNotification)
-
 
                 if ((DEFAULT_TIMEOUT - seconds) % DEFAULT_INTERVAL == 0 && seconds != DEFAULT_TIMEOUT) {
                     performDataScanAndUpload(tripId)
@@ -143,10 +155,14 @@ class RideService() : Service() {
         val bluetoothCount = bluetoothService.deviceCount.value
         bluetoothService.clearScan()
 
+        val wifiCount = wifiService.wifiCount.value
+        wifiService.requestNewScan()
+
         val reading = ScanReading(
+            wifiCount = wifiCount,
             bluetoothCount = bluetoothCount,
-            latitude = location?.latitude ?: 0.0,
-            longitude = location?.longitude ?: 0.0,
+            latitude = location?.latitude,
+            longitude = location?.longitude,
             subjectiveRating = currentRating,
         )
 
@@ -159,6 +175,7 @@ class RideService() : Service() {
         serviceJob.cancel()
         locationService.stopLocationUpdates()
         bluetoothService.stopScan()
+        wifiService.stopScan()
         isServiceRunning.value = false
     }
 

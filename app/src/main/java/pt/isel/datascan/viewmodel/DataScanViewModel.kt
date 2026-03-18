@@ -42,8 +42,8 @@ class DataScanViewModel : ViewModel() {
                     it.copy(
                         lastRead =
                             ScanReading(
-                                latitude = location?.latitude ?: 0.0,
-                                longitude = location?.longitude ?: 0.0
+                                latitude = location?.latitude,
+                                longitude = location?.longitude
                             )
                     )
                 }
@@ -53,6 +53,15 @@ class DataScanViewModel : ViewModel() {
             RideService.currentBluetoothCount.collect { count ->
                 _uiState.update { it.copy(
                     lastRead = it.lastRead?.copy(bluetoothCount = count)) }
+            }
+        }
+        viewModelScope.launch {
+            RideService.currentWifiCount.collect { count ->
+                _uiState.update {
+                    it.copy(
+                        lastRead = it.lastRead?.copy(wifiCount = count)
+                    )
+                }
             }
         }
     }

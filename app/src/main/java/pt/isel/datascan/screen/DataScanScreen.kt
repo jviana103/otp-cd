@@ -93,6 +93,8 @@ fun DataScanScreen(
 
                 Text("Dispositivos Bluetooth: ${state.lastRead?.bluetoothCount}")
 
+                Text("Dispositivos Wi-Fi: ${state.lastRead?.wifiCount}")
+
                 Text("Localização atual: ${state.lastRead?.latitude}, ${state.lastRead?.longitude}")
 
                 Button(
