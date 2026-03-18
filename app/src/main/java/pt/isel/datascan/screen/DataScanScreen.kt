@@ -1,22 +1,17 @@
 package pt.isel.datascan.screen
 
-import android.util.Log
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.outlined.Star
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -27,19 +22,18 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.MutableStateFlow
+import pt.isel.R
+import pt.isel.datascan.domain.TransportationType
 import pt.isel.datascan.viewmodel.DataScanViewModel
 import pt.isel.datascan.viewmodel.state.DEFAULT_TIMEOUT
 import pt.isel.datascan.viewmodel.state.DataScanUiState
 import pt.isel.ui.components.ConfirmationDialog
 import pt.isel.ui.components.RatingDialog
-import kotlin.time.Duration.Companion.seconds
-import kotlin.time.DurationUnit
-import kotlin.time.toDuration
+import pt.isel.ui.components.TransportSelectionBox
 
 @Composable
 fun DataScanScreen(
@@ -53,6 +47,8 @@ fun DataScanScreen(
     var showUpdateDialog by remember { mutableStateOf(false) }
     var showStopConfirmation by remember { mutableStateOf(false) }
 
+    val selectedType by viewModel.selectedTransport.collectAsState()
+
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -62,15 +58,53 @@ fun DataScanScreen(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             if (!state.isRiding) {
-                Text(
-                    text = "Pronto para iniciar a recolha?",
-                    style = MaterialTheme.typography.headlineSmall
-                )
-                Button(
-                    onClick = { viewModel.startRide() },
-                    modifier = Modifier.height(56.dp).fillMaxWidth(0.7f)
+                val selectedType by viewModel.selectedTransport.collectAsState()
+
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier = Modifier.padding(16.dp)
                 ) {
-                    Text("Iniciar Viagem")
+                    Text(
+                        text = "Selecione o meio de transporte:",
+                        style = MaterialTheme.typography.titleMedium,
+                        modifier = Modifier.padding(bottom = 20.dp)
+                    )
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        // --- METRO BOX ---
+                        TransportSelectionBox(
+                            type = TransportationType.METRO,
+                            isSelected = selectedType == TransportationType.METRO,
+                            iconRes = R.drawable.ic_train,
+                            label = "Metro",
+                            modifier = Modifier.weight(1f),
+                            onSelect = { viewModel.selectTransport(TransportationType.METRO) }
+                        )
+
+                        // --- TRAIN BOX ---
+                        TransportSelectionBox(
+                            type = TransportationType.TRAIN,
+                            isSelected = selectedType == TransportationType.TRAIN,
+                            iconRes = R.drawable.ic_train,
+                            label = "Comboio",
+                            modifier = Modifier.weight(1f),
+                            onSelect = { viewModel.selectTransport(TransportationType.TRAIN) }
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(32.dp))
+
+                    Button(
+                        onClick = { viewModel.startRide() },
+                        enabled = selectedType != null,
+                        modifier = Modifier.height(56.dp).fillMaxWidth(0.8f),
+                        shape = RoundedCornerShape(28.dp)
+                    ) {
+                        Text("Iniciar Recolha")
+                    }
                 }
             } else {
                 Text(
