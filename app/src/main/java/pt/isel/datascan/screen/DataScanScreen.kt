@@ -34,6 +34,7 @@ import pt.isel.datascan.viewmodel.state.DataScanUiState
 import pt.isel.ui.components.ConfirmationDialog
 import pt.isel.ui.components.RatingDialog
 import pt.isel.ui.components.TransportSelectionBox
+import pt.isel.helpers.formatTime
 
 @Composable
 fun DataScanScreen(
@@ -185,12 +186,6 @@ fun DataScanScreen(
             )
         }
     }
-}
-
-fun formatTime(seconds: Int): String {
-    val mins = seconds / 60
-    val secs = seconds % 60
-    return "%02d:%02d".format(mins, secs)
 }
 
 @Preview

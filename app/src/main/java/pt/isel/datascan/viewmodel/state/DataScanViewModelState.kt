@@ -10,6 +10,8 @@ var IS_TEST_TRIP = false
 
 const val DEFAULT_SUBJ_RATING = 3
 
+var NOTIFICATION_REMINDER_INTERVAL = 3 * 60
+
 data class DataScanUiState(
     val isRiding: Boolean = false,
     val isAwaitingInitialRating: Boolean = false,

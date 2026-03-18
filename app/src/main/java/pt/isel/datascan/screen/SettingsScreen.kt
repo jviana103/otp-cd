@@ -27,11 +27,14 @@ import androidx.compose.ui.unit.dp
 import pt.isel.datascan.viewmodel.state.DEFAULT_INTERVAL
 import pt.isel.datascan.viewmodel.state.DEFAULT_TIMEOUT
 import pt.isel.datascan.viewmodel.state.IS_TEST_TRIP
+import pt.isel.datascan.viewmodel.state.NOTIFICATION_REMINDER_INTERVAL
+import kotlin.math.roundToInt
 
 @Composable
 fun SettingsScreen() {
     var travelTime by remember { mutableFloatStateOf(DEFAULT_TIMEOUT / 60f) }
     var intervalTime by remember { mutableFloatStateOf(DEFAULT_INTERVAL.toFloat()) }
+    var notificationTime by remember { mutableFloatStateOf(NOTIFICATION_REMINDER_INTERVAL.toFloat()) }
     var isTestTrip by remember { mutableStateOf(IS_TEST_TRIP) }
 
     Column(
@@ -68,10 +71,26 @@ fun SettingsScreen() {
                 valueRange = 5f..120f,
                 steps = 115,
                 onValueChange = {
-                    intervalTime = it
-                    DEFAULT_INTERVAL = it.toInt()
+                    val roundedValue = it.roundToInt()
+                    intervalTime = roundedValue.toFloat()
+                    DEFAULT_INTERVAL = roundedValue
                 },
                 valueDisplay = "${intervalTime.toInt()} seg"
+            )
+
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+            SettingsSlider(
+                label = "Intervalo entre notificações",
+                value = notificationTime,
+                valueRange = 30f..300f,
+                steps = 26,
+                onValueChange = {
+                    val roundedValue = it.roundToInt()
+                    notificationTime = roundedValue.toFloat()
+                    NOTIFICATION_REMINDER_INTERVAL = roundedValue
+                },
+                valueDisplay = "${notificationTime.toInt()} seg"
             )
         }
 
