@@ -23,12 +23,15 @@ import pt.isel.datascan.domain.ScanReading
 import pt.isel.datascan.viewmodel.state.DEFAULT_INTERVAL
 import pt.isel.datascan.viewmodel.state.DEFAULT_SUBJ_RATING
 import pt.isel.datascan.viewmodel.state.DEFAULT_TIMEOUT
+import pt.isel.repository.FirestoreRepository
 import kotlin.time.Duration.Companion.seconds
 
 class RideService() : Service() {
     private lateinit var locationService: LocationService
-
     private lateinit var bluetoothService: BluetoothService
+
+    private val firestoreRepository = FirestoreRepository()
+    
     private val serviceJob = Job()
     private val serviceScope = CoroutineScope(Dispatchers.Main + serviceJob)
 
@@ -63,10 +66,14 @@ class RideService() : Service() {
                 currentRating = intent.getIntExtra("NEW_RATING", DEFAULT_SUBJ_RATING)
             }
             else -> {
-                val tripId = intent?.getStringExtra("TRIP_ID") ?: "unknown"
+                val tripId = intent?.getStringExtra("TRIP_ID") ?: "unknown_${System.currentTimeMillis()}"
+                val transportType = intent?.getStringExtra("TRANSPORT_TYPE") ?: "Unknown"
                 currentRating = intent?.getIntExtra("RATING", DEFAULT_SUBJ_RATING)
                     ?: DEFAULT_SUBJ_RATING
+                
                 startForeground(1, createNotificationWithTime(DEFAULT_TIMEOUT))
+
+                firestoreRepository.createTrip(tripId = tripId, transportType = transportType)
 
                 locationService.startLocationUpdates()
                 bluetoothService.startScan()
@@ -143,7 +150,8 @@ class RideService() : Service() {
             subjectiveRating = currentRating,
         )
 
-        Log.e("RideService", "Uploading reading: $reading")
+        Log.d("RideService", "Uploading reading to Firestore: $reading")
+        firestoreRepository.addReading(tripId, reading)
     }
 
     override fun onDestroy() {
