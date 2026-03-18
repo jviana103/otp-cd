@@ -4,6 +4,7 @@ import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.GeoPoint
 import pt.isel.datascan.domain.ScanReading
+import pt.isel.datascan.domain.TripData
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -14,16 +15,13 @@ class FirestoreRepository(
 
     fun createTrip(
         tripId: String,
-        transportType: String = "Unknown",
+        trip : TripData,
         onSuccess: () -> Unit = {},
         onFailure: (Exception) -> Unit = {}
     ) {
-        val tripData = mapOf(
-            "tipo_transporte" to transportType,
-            "data_hora_inicio" to SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault()).format(Date())
-        )
+        val tripData = trip.toMap()
 
-        db.collection("viagens")
+        db.collection("viagens_teste")
             .document(tripId)
             .set(tripData)
             .addOnSuccessListener {
@@ -42,18 +40,9 @@ class FirestoreRepository(
         onSuccess: () -> Unit = {},
         onFailure: (Exception) -> Unit = {}
     ) {
-        val readingData = mapOf(
-            "timestamp_leitura" to SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault()).format(Date(reading.timestamp)),
-            "qtd_dispositivos_bluetooth" to reading.bluetoothCount,
-            "qtd_access_points" to reading.wifiCount,
-            "intensidade_sinal_5_ap" to reading.signalIntensities,
-            "localizacao" to GeoPoint(reading.latitude ?: 0.0, reading.longitude ?: 0.0),
-            "latencia" to reading.latency,
-            "perda_pacotes" to 0.0,
-            "avaliacao_subjetiva" to reading.subjectiveRating
-        )
+        val readingData = reading.toMap()
 
-        db.collection("viagens")
+        db.collection("viagens_teste")
             .document(tripId)
             .collection("leituras")
             .add(readingData)
@@ -67,3 +56,5 @@ class FirestoreRepository(
             }
     }
 }
+
+

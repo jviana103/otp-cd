@@ -1,5 +1,7 @@
 package pt.isel.datascan.domain
 
+import com.google.firebase.firestore.GeoPoint
+
 data class ScanReading(
     val timestamp: Long = System.currentTimeMillis(),
     val bluetoothCount: Int = 0,
@@ -9,4 +11,14 @@ data class ScanReading(
     val longitude: Double? = null,
     val latency: Long = 0,
     val subjectiveRating: Int = 0
-)
+) {
+    fun toMap(): Map<String, Any?> = mapOf(
+        "timestamp" to timestamp,
+        "bluetoothCount" to bluetoothCount,
+        "wifiCount" to wifiCount,
+        "signalIntensities" to signalIntensities,
+        "location" to GeoPoint(latitude ?: 0.0, longitude ?: 0.0),
+        "latency" to latency,
+        "subjectiveRating" to subjectiveRating
+    )
+}
