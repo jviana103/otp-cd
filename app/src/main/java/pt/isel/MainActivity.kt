@@ -11,9 +11,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBox
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -29,8 +28,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import pt.isel.datascan.screen.DataScanScreen
+import pt.isel.datascan.screen.SettingsScreen
 import pt.isel.datascan.viewmodel.DataScanViewModel
 import pt.isel.ui.theme.FirstAppTheme
 
@@ -96,8 +95,7 @@ fun MainAppContainer(viewModel: DataScanViewModel) {
                             }
                         )
                     }
-                    AppDestinations.FAVORITES -> Text("Histórico de Viagens")
-                    AppDestinations.PROFILE -> Text("Perfil do Voluntário")
+                    AppDestinations.SETTINGS -> SettingsScreen()
                 }
             }
         }
@@ -109,8 +107,7 @@ enum class AppDestinations(
     val icon: ImageVector,
 ) {
     HOME("Home", Icons.Default.Home),
-    FAVORITES("Favorites", Icons.Default.Favorite),
-    PROFILE("Profile", Icons.Default.AccountBox),
+    SETTINGS("Settings", Icons.Default.Settings),
 }
 
 @Composable

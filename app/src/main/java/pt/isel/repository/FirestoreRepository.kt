@@ -2,16 +2,18 @@ package pt.isel.repository
 
 import android.util.Log
 import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.GeoPoint
+
 import pt.isel.datascan.domain.ScanReading
 import pt.isel.datascan.domain.TripData
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import pt.isel.datascan.viewmodel.state.IS_TEST_TRIP
+
 
 class FirestoreRepository(
     private val db: FirebaseFirestore = FirebaseFirestore.getInstance("otp-cd-db")
 ) {
+
+    private val collectionName: String
+        get() = if (IS_TEST_TRIP) "viagens_teste" else "viagens"
 
     fun createTrip(
         tripId: String,
@@ -21,11 +23,11 @@ class FirestoreRepository(
     ) {
         val tripData = trip.toMap()
 
-        db.collection("viagens_teste")
+        db.collection(collectionName)
             .document(tripId)
             .set(tripData)
             .addOnSuccessListener {
-                Log.d("FirestoreRepository", "Trip $tripId initialized successfully")
+                Log.d("FirestoreRepository", "Trip $tripId initialized successfully in $collectionName")
                 onSuccess()
             }
             .addOnFailureListener { e ->
@@ -42,12 +44,12 @@ class FirestoreRepository(
     ) {
         val readingData = reading.toMap()
 
-        db.collection("viagens_teste")
+        db.collection(collectionName)
             .document(tripId)
             .collection("leituras")
             .add(readingData)
             .addOnSuccessListener { ref ->
-                Log.d("FirestoreRepository", "Reading stored with ID: ${ref.id} for trip $tripId")
+                Log.d("FirestoreRepository", "Reading stored with ID: ${ref.id} for trip $tripId in $collectionName")
                 onSuccess()
             }
             .addOnFailureListener { e ->
@@ -56,5 +58,3 @@ class FirestoreRepository(
             }
     }
 }
-
-
