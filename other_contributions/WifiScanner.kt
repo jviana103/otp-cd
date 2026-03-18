@@ -1,3 +1,7 @@
+private lateinit var wifiManager: WifiManager
+private lateinit var txtLog: TextView
+private lateinit var btnScan: Button
+
 private fun initiateWifiScan() {
     val wifiScanReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
