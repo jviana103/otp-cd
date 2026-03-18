@@ -35,6 +35,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import pt.isel.datascan.viewmodel.DataScanViewModel
 import pt.isel.datascan.viewmodel.state.DEFAULT_TIMEOUT
 import pt.isel.datascan.viewmodel.state.DataScanUiState
+import pt.isel.ui.components.ConfirmationDialog
 import pt.isel.ui.components.RatingDialog
 import kotlin.time.Duration.Companion.seconds
 import kotlin.time.DurationUnit
@@ -50,6 +51,7 @@ fun DataScanScreen(
     val state by viewModel.uiState.collectAsState()
 
     var showUpdateDialog by remember { mutableStateOf(false) }
+    var showStopConfirmation by remember { mutableStateOf(false) }
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -101,7 +103,7 @@ fun DataScanScreen(
                 }
 
                 Button(
-                    onClick = onStopService,
+                    onClick = { showStopConfirmation = true },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.error
                     ),
@@ -120,6 +122,20 @@ fun DataScanScreen(
                     showUpdateDialog = false
                 },
                 onDismiss = { showUpdateDialog = false }
+            )
+        }
+
+        if (showStopConfirmation) {
+            ConfirmationDialog(
+                title = "Finalizar Viagem?",
+                message = "Deseja terminar a viagem?",
+                confirmText = "Sim, Parar",
+                isDestructive = true,
+                onConfirm = {
+                    showStopConfirmation = false
+                    onStopService()
+                },
+                onDismiss = { showStopConfirmation = false }
             )
         }
 
