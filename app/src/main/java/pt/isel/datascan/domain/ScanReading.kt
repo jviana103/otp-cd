@@ -10,7 +10,8 @@ data class ScanReading(
     val signalIntensitiesWF: List<Int> = emptyList(),
     val latitude: Double? = null,
     val longitude: Double? = null,
-    val latency: Long = 0,
+    val latencyStdDev: Double = 0.0,
+    val packetLoss: Double = 0.0,
     val subjectiveRating: Int = 0
 ) {
     fun toMap(): Map<String, Any?> = mapOf(
@@ -18,8 +19,10 @@ data class ScanReading(
         "bluetoothCount" to bluetoothCount,
         "wifiCount" to wifiCount,
         "signalIntensitiesBT" to signalIntensitiesBT,
+        "signalIntensitiesWF" to signalIntensitiesWF,
         "location" to GeoPoint(latitude ?: 0.0, longitude ?: 0.0),
-        "latency" to latency,
+        "latencyStdDev" to latencyStdDev,
+        "packetLoss" to packetLoss,
         "subjectiveRating" to subjectiveRating
     )
 }

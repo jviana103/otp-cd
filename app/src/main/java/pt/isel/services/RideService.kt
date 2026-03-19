@@ -35,13 +35,10 @@ import kotlin.time.Duration.Companion.seconds
 
 class RideService() : Service() {
     private lateinit var locationService: LocationService
-
     private lateinit var bluetoothService: BluetoothService
-
     private lateinit var wifiService: WifiService
-
     private lateinit var notificationHelper: NotificationHelper
-
+    private val networkService = NetworkService()
     private val firestoreRepository = FirestoreRepository()
 
     private val serviceJob = Job()
@@ -118,8 +115,7 @@ class RideService() : Service() {
                 secondsRemaining.value = seconds
 
                 notificationHelper.updateTimerNotification(seconds)
-                val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-
+                
                 if ((DEFAULT_TIMEOUT - seconds) % DEFAULT_INTERVAL == 0 && seconds != DEFAULT_TIMEOUT) {
                     performDataScanAndUpload(tripId)
                     if ((DEFAULT_TIMEOUT - seconds) % NOTIFICATION_REMINDER_INTERVAL == 0 && seconds != DEFAULT_TIMEOUT) {
@@ -166,26 +162,33 @@ class RideService() : Service() {
     }
 
     private fun performDataScanAndUpload(tripId: String) {
-        Log.d("RideService", "Performing data scan and uploading for trip $tripId")
-        val location = locationService.currentLocation.value
-        val bluetoothCount = bluetoothService.deviceCount.value
-        val signalIntensitiesBT = bluetoothService.strongestSignals.value
-        bluetoothService.clearScan()
+        serviceScope.launch(Dispatchers.IO) {
+            Log.d("RideService", "Performing data scan and uploading for trip $tripId")
+            
+            val networkMetrics = networkService.measureNetworkMetrics()
+            
+            val location = locationService.currentLocation.value
+            val bluetoothCount = bluetoothService.deviceCount.value
+            val signalIntensitiesBT = bluetoothService.strongestSignals.value
+            bluetoothService.clearScan()
 
-        val wifiCount = wifiService.wifiCount.value
-        wifiService.requestNewScan()
+            val wifiCount = wifiService.wifiCount.value
+            wifiService.requestNewScan()
 
-        val reading = ScanReading(
-            signalIntensitiesBT = signalIntensitiesBT,
-            wifiCount = wifiCount,
-            bluetoothCount = bluetoothCount,
-            latitude = location?.latitude,
-            longitude = location?.longitude,
-            subjectiveRating = currentRating,
-        )
+            val reading = ScanReading(
+                signalIntensitiesBT = signalIntensitiesBT,
+                wifiCount = wifiCount,
+                bluetoothCount = bluetoothCount,
+                latitude = location?.latitude,
+                longitude = location?.longitude,
+                latencyStdDev = networkMetrics.latencyStdDev,
+                packetLoss = networkMetrics.packetLoss,
+                subjectiveRating = currentRating,
+            )
 
-        Log.d("RideService", "Uploading reading to Firestore: $reading")
-        firestoreRepository.addReading(tripId, reading)
+            Log.d("RideService", "Uploading reading to Firestore: $reading")
+            firestoreRepository.addReading(tripId, reading)
+        }
     }
 
     override fun onDestroy() {
