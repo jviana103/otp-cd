@@ -153,12 +153,14 @@ class RideService() : Service() {
         Log.d("RideService", "Performing data scan and uploading for trip $tripId")
         val location = locationService.currentLocation.value
         val bluetoothCount = bluetoothService.deviceCount.value
+        val signalIntensitiesBT = bluetoothService.strongestSignals.value
         bluetoothService.clearScan()
 
         val wifiCount = wifiService.wifiCount.value
         wifiService.requestNewScan()
 
         val reading = ScanReading(
+            signalIntensitiesBT = signalIntensitiesBT,
             wifiCount = wifiCount,
             bluetoothCount = bluetoothCount,
             latitude = location?.latitude,

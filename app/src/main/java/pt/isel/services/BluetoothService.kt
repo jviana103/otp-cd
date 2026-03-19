@@ -1,19 +1,21 @@
 package pt.isel.services
 
 import android.annotation.SuppressLint
-import android.app.Service
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothManager
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanResult
-import android.bluetooth.le.ScanSettings
 import android.content.Context
-import android.content.Intent
-import android.os.IBinder
 import android.util.Log
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 
 class BluetoothService(private val context: Context) {
     private val bluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
@@ -22,17 +24,32 @@ class BluetoothService(private val context: Context) {
     private val _deviceCount = MutableStateFlow(0)
     val deviceCount: StateFlow<Int> = _deviceCount.asStateFlow()
 
-    private val discoveredDevices = mutableMapOf<String, Int>()
+    private val discoveredDevices = MutableStateFlow<Map<String, Int>>(emptyMap())
+
+    private val serviceScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+    val strongestSignals: StateFlow<List<Int>> = discoveredDevices
+        .map { devices ->
+            devices.values
+                .sortedDescending()
+                .take(5)
+        }
+        .stateIn(
+            scope = serviceScope,
+            started = SharingStarted.WhileSubscribed(5000),
+            initialValue = emptyList()
+        )
 
     private val scanCallback = object : ScanCallback() {
         override fun onScanResult(callbackType: Int, result: ScanResult) {
             val deviceAddress = result.device.address
             val rssi = result.rssi
 
-            if (!discoveredDevices.containsKey(deviceAddress)) {
-                discoveredDevices[deviceAddress] = rssi
-                _deviceCount.value = discoveredDevices.size
-                Log.d("BluetoothService", "New device: $deviceAddress | Count: ${discoveredDevices.size}")
+            if (!discoveredDevices.value.containsKey(deviceAddress)) {
+                val allDevices = discoveredDevices.value.toMutableMap()
+                allDevices[deviceAddress] = rssi
+                _deviceCount.value = allDevices.size
+                discoveredDevices.value = allDevices
+                Log.d("BluetoothService", "New device: $deviceAddress | Count: ${deviceCount.value}")
             }
         }
     }
@@ -49,14 +66,14 @@ class BluetoothService(private val context: Context) {
     }
 
     fun clearScan() {
-        discoveredDevices.clear()
+        discoveredDevices.value = emptyMap()
         _deviceCount.value = 0
     }
 
     @SuppressLint("MissingPermission")
     fun stopScan() {
         bluetoothAdapter?.bluetoothLeScanner?.stopScan(scanCallback)
-        discoveredDevices.clear()
+        discoveredDevices.value = emptyMap()
         _deviceCount.value = 0
     }
 }
