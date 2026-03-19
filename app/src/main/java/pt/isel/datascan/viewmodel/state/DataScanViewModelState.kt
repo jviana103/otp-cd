@@ -2,12 +2,15 @@ package pt.isel.datascan.viewmodel.state
 
 
 import pt.isel.datascan.domain.ScanReading
-import kotlin.time.Duration.Companion.seconds
 
-const val DEFAULT_TIMEOUT = 15 * 60
+
+var DEFAULT_TIMEOUT = 15 * 60
+var DEFAULT_INTERVAL = 30
+var IS_TEST_TRIP = false
+
 const val DEFAULT_SUBJ_RATING = 3
 
-const val DEFAULT_INTERVAL = 30
+var NOTIFICATION_REMINDER_INTERVAL = 3 * 60
 
 data class DataScanUiState(
     val isRiding: Boolean = false,

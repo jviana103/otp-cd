@@ -21,10 +21,16 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import pt.isel.MainActivity
 import pt.isel.datascan.domain.ScanReading
+import pt.isel.datascan.domain.TripData
 import pt.isel.datascan.viewmodel.state.DEFAULT_INTERVAL
 import pt.isel.datascan.viewmodel.state.DEFAULT_SUBJ_RATING
 import pt.isel.datascan.viewmodel.state.DEFAULT_TIMEOUT
+import pt.isel.datascan.viewmodel.state.NOTIFICATION_REMINDER_INTERVAL
+import pt.isel.helpers.NotificationHelper
 import pt.isel.repository.FirestoreRepository
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import kotlin.time.Duration.Companion.seconds
 
 class RideService() : Service() {
@@ -33,6 +39,8 @@ class RideService() : Service() {
     private lateinit var bluetoothService: BluetoothService
 
     private lateinit var wifiService: WifiService
+
+    private lateinit var notificationHelper: NotificationHelper
 
     private val firestoreRepository = FirestoreRepository()
 
@@ -68,6 +76,7 @@ class RideService() : Service() {
                 currentWifiCount.value = count
             }
         }
+        notificationHelper = NotificationHelper(this)
     }
 
     private var currentRating = DEFAULT_SUBJ_RATING
@@ -85,11 +94,16 @@ class RideService() : Service() {
 
                 startForeground(1, createNotificationWithTime(DEFAULT_TIMEOUT))
 
-                firestoreRepository.createTrip(tripId = tripId, transportType = transportType)
+                val trip = TripData(
+                    transportType = transportType,
+                    startDate = SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault()).format(Date())
+                )
 
-                locationService.startLocationUpdates()
-                bluetoothService.startScan()
-                wifiService.startScan()
+                firestoreRepository.createTrip(tripId = tripId, trip = trip, onSuccess = {
+                    locationService.startLocationUpdates()
+                    bluetoothService.startScan()
+                    wifiService.startScan()
+                })
 
                 startRideTicker(tripId)
             }
@@ -103,12 +117,14 @@ class RideService() : Service() {
             for (seconds in DEFAULT_TIMEOUT downTo 0) {
                 secondsRemaining.value = seconds
 
-                val updatedNotification = createNotificationWithTime(seconds)
+                notificationHelper.updateTimerNotification(seconds)
                 val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-                manager.notify(1, updatedNotification)
 
                 if ((DEFAULT_TIMEOUT - seconds) % DEFAULT_INTERVAL == 0 && seconds != DEFAULT_TIMEOUT) {
                     performDataScanAndUpload(tripId)
+                    if ((DEFAULT_TIMEOUT - seconds) % NOTIFICATION_REMINDER_INTERVAL == 0 && seconds != DEFAULT_TIMEOUT) {
+                        notificationHelper.sendRatingReminder()
+                    }
                 }
 
                 delay(1.seconds)

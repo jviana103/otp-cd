@@ -14,6 +14,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import pt.isel.datascan.domain.ScanReading
+import pt.isel.datascan.domain.TransportationType
 import pt.isel.datascan.viewmodel.state.DEFAULT_INTERVAL
 import pt.isel.datascan.viewmodel.state.DEFAULT_TIMEOUT
 import pt.isel.datascan.viewmodel.state.DataScanUiState
@@ -24,6 +25,13 @@ import kotlin.time.Duration.Companion.seconds
 class DataScanViewModel : ViewModel() {
     private val _uiState = MutableStateFlow(DataScanUiState())
     var uiState = _uiState.asStateFlow()
+
+    private val _selectedTransport = MutableStateFlow<TransportationType?>(null)
+    val selectedTransport = _selectedTransport.asStateFlow()
+
+    fun selectTransport(type: TransportationType) {
+        _selectedTransport.value = type
+    }
 
     init {
         viewModelScope.launch {
@@ -90,6 +98,7 @@ class DataScanViewModel : ViewModel() {
         val intent = Intent(context, RideService::class.java).apply {
             putExtra("TRIP_ID", newTripId)
             putExtra("RATING", rating)
+            putExtra("TRANSPORT_TYPE", selectedTransport.value?.name)
         }
         context.startForegroundService(intent)
 
