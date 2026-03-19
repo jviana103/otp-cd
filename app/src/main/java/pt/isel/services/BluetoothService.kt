@@ -18,41 +18,41 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 
 class BluetoothService(private val context: Context) {
-    private val bluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
-    private val bluetoothAdapter: BluetoothAdapter? = bluetoothManager.adapter
+        private val bluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
+        private val bluetoothAdapter: BluetoothAdapter? = bluetoothManager.adapter
 
-    private val _deviceCount = MutableStateFlow(0)
-    val deviceCount: StateFlow<Int> = _deviceCount.asStateFlow()
+        private val _deviceCount = MutableStateFlow(0)
+        val deviceCount: StateFlow<Int> = _deviceCount.asStateFlow()
 
-    private val discoveredDevices = MutableStateFlow<Map<String, Int>>(emptyMap())
+        private val discoveredDevices = MutableStateFlow<Map<String, Int>>(emptyMap())
 
-    private val serviceScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
-    val strongestSignals: StateFlow<List<Int>> = discoveredDevices
-        .map { devices ->
-            devices.values
-                .sortedDescending()
-                .take(5)
-        }
-        .stateIn(
-            scope = serviceScope,
-            started = SharingStarted.WhileSubscribed(5000),
-            initialValue = emptyList()
-        )
+        private val serviceScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+        val strongestSignals: StateFlow<List<Int>> = discoveredDevices
+            .map { devices ->
+                devices.values
+                    .sortedDescending()
+                    .take(5)
+            }
+            .stateIn(
+                scope = serviceScope,
+                started = SharingStarted.Eagerly,
+                initialValue = emptyList()
+            )
 
-    private val scanCallback = object : ScanCallback() {
-        override fun onScanResult(callbackType: Int, result: ScanResult) {
-            val deviceAddress = result.device.address
-            val rssi = result.rssi
+        private val scanCallback = object : ScanCallback() {
+            override fun onScanResult(callbackType: Int, result: ScanResult) {
+                val deviceAddress = result.device.address
+                val rssi = result.rssi
 
-            if (!discoveredDevices.value.containsKey(deviceAddress)) {
-                val allDevices = discoveredDevices.value.toMutableMap()
-                allDevices[deviceAddress] = rssi
-                _deviceCount.value = allDevices.size
-                discoveredDevices.value = allDevices
-                Log.d("BluetoothService", "New device: $deviceAddress | Count: ${deviceCount.value}")
+                if (!discoveredDevices.value.containsKey(deviceAddress)) {
+                    val allDevices = discoveredDevices.value.toMutableMap()
+                    allDevices[deviceAddress] = rssi
+                    _deviceCount.value = allDevices.size
+                    discoveredDevices.value = allDevices
+                    Log.d("BluetoothService", "New device: $deviceAddress | Count: ${deviceCount.value}")
+                }
             }
         }
-    }
 
     @SuppressLint("MissingPermission")
     fun startScan() {

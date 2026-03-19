@@ -17,7 +17,7 @@ data class ScanReading(
         "timestamp" to timestamp,
         "bluetoothCount" to bluetoothCount,
         "wifiCount" to wifiCount,
-        "signalIntensities" to signalIntensities,
+        "signalIntensitiesBT" to signalIntensitiesBT,
         "location" to GeoPoint(latitude ?: 0.0, longitude ?: 0.0),
         "latency" to latency,
         "subjectiveRating" to subjectiveRating
