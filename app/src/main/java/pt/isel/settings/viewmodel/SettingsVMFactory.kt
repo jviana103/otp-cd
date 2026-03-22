@@ -1,14 +1,14 @@
-package pt.isel.datascan.viewmodel
+package pt.isel.settings.viewmodel
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import pt.isel.settings.domain.repository.SettingsRepository
 
 @Suppress("UNCHECKED_CAST")
-class DataScanVMFactory(
-    private val repository: SettingsRepository
+class SettingsVMFactoryVMFactory(
+    private val settingsRepository: SettingsRepository
 ): ViewModelProvider.Factory {
     override fun <T : ViewModel> create(modelClass: Class<T>): T {
-        return DataScanViewModel(repository) as T
+        return SettingsViewModel(settingsRepository) as T
     }
 }

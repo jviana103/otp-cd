@@ -25,6 +25,7 @@ import pt.isel.datascan.domain.TripData
 import pt.isel.datascan.viewmodel.state.DEFAULT_INTERVAL
 import pt.isel.datascan.viewmodel.state.DEFAULT_SUBJ_RATING
 import pt.isel.datascan.viewmodel.state.DEFAULT_TIMEOUT
+import pt.isel.datascan.viewmodel.state.IS_TEST_TRIP
 import pt.isel.datascan.viewmodel.state.NOTIFICATION_REMINDER_INTERVAL
 import pt.isel.helpers.NotificationHelper
 import pt.isel.repository.FirestoreRepository
@@ -35,19 +36,26 @@ import kotlin.time.Duration.Companion.seconds
 
 class RideService() : Service() {
     private lateinit var locationService: LocationService
+
     private lateinit var bluetoothService: BluetoothService
+
     private lateinit var wifiService: WifiService
+
     private lateinit var notificationHelper: NotificationHelper
-    private val networkService = NetworkService()
+    private lateinit var networkService: NetworkService
     private val firestoreRepository = FirestoreRepository()
 
     private val serviceJob = Job()
     private val serviceScope = CoroutineScope(Dispatchers.Main + serviceJob)
 
+    private var currentTimeout = DEFAULT_TIMEOUT
+    private var currentScanInterval = DEFAULT_INTERVAL
+    private var currentNotifInterval = NOTIFICATION_REMINDER_INTERVAL
+    private var isTestTrip = IS_TEST_TRIP
+
     companion object {
         val secondsRemaining = MutableStateFlow(DEFAULT_TIMEOUT)
         val isServiceRunning = MutableStateFlow(false)
-        val isPaused = MutableStateFlow(false)
         val currentLocation = MutableStateFlow<Location?>(null)
         val currentBluetoothCount = MutableStateFlow(0)
         val currentWifiCount = MutableStateFlow(0)
@@ -75,6 +83,8 @@ class RideService() : Service() {
             }
         }
         notificationHelper = NotificationHelper(this)
+
+        networkService = NetworkService()
     }
 
     private var currentRating = DEFAULT_SUBJ_RATING
@@ -84,19 +94,22 @@ class RideService() : Service() {
             "UPDATE_RATING" -> {
                 currentRating = intent.getIntExtra("NEW_RATING", DEFAULT_SUBJ_RATING)
             }
-            "PAUSE" -> {
-                isPaused.value = true
-            }
-            "RESUME" -> {
-                isPaused.value = false
-            }
             else -> {
+                currentTimeout = intent?.getIntExtra("TIMEOUT", DEFAULT_TIMEOUT) ?: DEFAULT_TIMEOUT
+                currentScanInterval = intent?.getIntExtra("INTERVAL", DEFAULT_INTERVAL) ?: DEFAULT_INTERVAL
+                currentNotifInterval = intent?.getIntExtra("NOTIF_INTERVAL", NOTIFICATION_REMINDER_INTERVAL) ?: NOTIFICATION_REMINDER_INTERVAL
+                isTestTrip = intent?.getBooleanExtra("IS_TEST", IS_TEST_TRIP) ?: IS_TEST_TRIP
+
+                firestoreRepository.isTest = isTestTrip
+
                 val tripId = intent?.getStringExtra("TRIP_ID") ?: "unknown_${System.currentTimeMillis()}"
                 val transportType = intent?.getStringExtra("TRANSPORT_TYPE") ?: "Unknown"
                 currentRating = intent?.getIntExtra("RATING", DEFAULT_SUBJ_RATING)
                     ?: DEFAULT_SUBJ_RATING
 
-                startForeground(1, createNotificationWithTime(DEFAULT_TIMEOUT))
+                secondsRemaining.value = currentTimeout
+
+                startForeground(1, createNotificationWithTime(currentTimeout))
 
                 val trip = TripData(
                     transportType = transportType,
@@ -117,22 +130,22 @@ class RideService() : Service() {
 
     private fun startRideTicker(tripId: String) {
         isServiceRunning.value = true
-        isPaused.value = false
         serviceScope.launch {
-            var seconds = DEFAULT_TIMEOUT
-            while (seconds >= 0) {
-                if (!isPaused.value) {
-                    secondsRemaining.value = seconds
-                    notificationHelper.updateTimerNotification(seconds)
-                    
-                    if ((DEFAULT_TIMEOUT - seconds) % DEFAULT_INTERVAL == 0 && seconds != DEFAULT_TIMEOUT) {
-                        performDataScanAndUpload(tripId)
-                        if ((DEFAULT_TIMEOUT - seconds) % NOTIFICATION_REMINDER_INTERVAL == 0 && seconds != DEFAULT_TIMEOUT) {
-                            notificationHelper.sendRatingReminder()
-                        }
-                    }
-                    seconds--
+            for (seconds in currentTimeout downTo 0) {
+                secondsRemaining.value = seconds
+
+                notificationHelper.updateTimerNotification(seconds)
+
+                val elapsedTime = currentTimeout - seconds
+
+                if (elapsedTime % currentScanInterval == 0 && seconds != currentTimeout) {
+                    performDataScanAndUpload(tripId)
                 }
+
+                if (elapsedTime % currentNotifInterval == 0 && seconds != currentTimeout) {
+                    notificationHelper.sendRatingReminder()
+                }
+
                 delay(1.seconds)
             }
             stopSelf()
@@ -172,11 +185,11 @@ class RideService() : Service() {
     }
 
     private fun performDataScanAndUpload(tripId: String) {
-        serviceScope.launch(Dispatchers.IO) {
+        serviceScope.launch {
             Log.d("RideService", "Performing data scan and uploading for trip $tripId")
-            
+
             val networkMetrics = networkService.measureNetworkMetrics()
-            
+
             val location = locationService.currentLocation.value
             val bluetoothCount = bluetoothService.deviceCount.value
             val signalIntensitiesBT = bluetoothService.strongestSignals.value
@@ -208,7 +221,6 @@ class RideService() : Service() {
         bluetoothService.stopScan()
         wifiService.stopScan()
         isServiceRunning.value = false
-        isPaused.value = false
     }
 
     override fun onBind(intent: Intent?): IBinder? = null

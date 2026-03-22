@@ -25,13 +25,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.flow.MutableStateFlow
 import pt.isel.R
 import pt.isel.datascan.domain.TransportationType
 import pt.isel.datascan.viewmodel.DataScanViewModel
+import pt.isel.datascan.viewmodel.state.DEFAULT_TIMEOUT
+import pt.isel.datascan.viewmodel.state.DataScanUiState
 import pt.isel.ui.components.ConfirmationDialog
 import pt.isel.ui.components.RatingDialog
 import pt.isel.ui.components.TransportSelectionBox
 import pt.isel.helpers.formatTime
+import pt.isel.settings.domain.repository.MockSettingsRepository
 
 @Composable
 fun DataScanScreen(
@@ -44,6 +48,8 @@ fun DataScanScreen(
 
     var showUpdateDialog by remember { mutableStateOf(false) }
     var showStopConfirmation by remember { mutableStateOf(false) }
+
+    val selectedType by viewModel.selectedTransport.collectAsState()
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -73,7 +79,7 @@ fun DataScanScreen(
                         TransportSelectionBox(
                             type = TransportationType.METRO,
                             isSelected = selectedType == TransportationType.METRO,
-                            iconRes = R.drawable.ic_subway,
+                            iconRes = R.drawable.ic_train,
                             label = "Metro",
                             modifier = Modifier.weight(1f),
                             onSelect = { viewModel.selectTransport(TransportationType.METRO) }
@@ -102,48 +108,34 @@ fun DataScanScreen(
                 }
             } else {
                 Text(
-                    text = if (state.isPaused) "Viagem Pausada" else "Tempo Restante",
+                    text = "Tempo Restante",
                     style = MaterialTheme.typography.labelLarge
                 )
 
                 Text(
                     text = formatTime(state.secondsRemaining),
                     style = MaterialTheme.typography.displayLarge,
-                    color = if (state.isPaused) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.primary
                 )
 
-                if (!state.isPaused) {
-                    Text(
-                        text = "A recolher evidências sem fio...",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
+                Text(
+                    text = "A recolher evidências sem fio...",
+                    style = MaterialTheme.typography.bodyMedium
+                )
 
                 Text("Ocupação atual: ${state.currentSubjectiveRating}")
 
-                Text("Dispositivos Bluetooth: ${state.lastRead?.bluetoothCount ?: 0}")
+                Text("Dispositivos Bluetooth: ${state.lastRead?.bluetoothCount}")
 
-                Text("Dispositivos Wi-Fi: ${state.lastRead?.wifiCount ?: 0}")
+                Text("Dispositivos Wi-Fi: ${state.lastRead?.wifiCount}")
 
-                Text("Localização atual: ${state.lastRead?.latitude ?: 0.0}, ${state.lastRead?.longitude ?: 0.0}")
+                Text("Localização atual: ${state.lastRead?.latitude}, ${state.lastRead?.longitude}")
 
-                Row(
-                    modifier = Modifier.fillMaxWidth(0.8f),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                Button(
+                    onClick = { showUpdateDialog = true },
+                    modifier = Modifier.padding(top = 8.dp)
                 ) {
-                    Button(
-                        onClick = { viewModel.togglePause(context) },
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text(if (state.isPaused) "Retomar" else "Pausar")
-                    }
-
-                    Button(
-                        onClick = { showUpdateDialog = true },
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text("Alterar lotação")
-                    }
+                    Text("Alterar Lotação")
                 }
 
                 Button(
@@ -151,7 +143,7 @@ fun DataScanScreen(
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.error
                     ),
-                    modifier = Modifier.fillMaxWidth(0.8f)
+                    modifier = Modifier.padding(top = 16.dp)
                 ) {
                     Text("Parar Viagem")
                 }
@@ -188,6 +180,7 @@ fun DataScanScreen(
                 onConfirm = onStartService,
                 onDismiss = {
                     viewModel.cancelStart()
+                    showUpdateDialog = false;
                 }
             )
         }
@@ -197,8 +190,26 @@ fun DataScanScreen(
 @Preview
 @Composable
 fun DataScanScreenPreview() {
+    val mockRepo = MockSettingsRepository()
     DataScanScreen(
-        viewModel = DataScanViewModel(),
+        viewModel = DataScanViewModel(mockRepo),
+        onStartService = {},
+        onStopService = {}
+    )
+}
+
+@Preview
+@Composable
+fun DataScanScreenPreviewInTravel() {
+    val mockRepo = MockSettingsRepository()
+    val viewModel = DataScanViewModel(mockRepo)
+    viewModel.uiState = MutableStateFlow(
+        DataScanUiState(
+            isRiding = true,
+            secondsRemaining = DEFAULT_TIMEOUT,
+        ))
+    DataScanScreen(
+        viewModel = viewModel,
         onStartService = {},
         onStopService = {}
     )

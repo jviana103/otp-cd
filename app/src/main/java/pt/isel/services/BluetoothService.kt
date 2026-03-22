@@ -16,7 +16,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 
 class BluetoothService(private val context: Context) {
         private val bluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
@@ -45,10 +44,13 @@ class BluetoothService(private val context: Context) {
                 val deviceAddress = result.device.address
                 val rssi = result.rssi
 
-                discoveredDevices.update { it + (deviceAddress to rssi) }
-                _deviceCount.value = discoveredDevices.value.size
-
-                Log.d("BluetoothService", "Dispositivo: $deviceAddress | Sinal: $rssi")
+                if (!discoveredDevices.value.containsKey(deviceAddress)) {
+                    val allDevices = discoveredDevices.value.toMutableMap()
+                    allDevices[deviceAddress] = rssi
+                    _deviceCount.value = allDevices.size
+                    discoveredDevices.value = allDevices
+                    Log.d("BluetoothService", "New device: $deviceAddress | Count: ${deviceCount.value}")
+                }
             }
         }
 
