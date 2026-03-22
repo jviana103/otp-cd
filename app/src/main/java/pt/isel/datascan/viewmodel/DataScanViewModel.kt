@@ -45,6 +45,11 @@ class DataScanViewModel : ViewModel() {
             }
         }
         viewModelScope.launch {
+            RideService.isPaused.collect { paused ->
+                _uiState.update { it.copy(isPaused = paused) }
+            }
+        }
+        viewModelScope.launch {
             RideService.currentLocation.collect { location ->
                 _uiState.update {
                     it.copy(
@@ -102,6 +107,14 @@ class DataScanViewModel : ViewModel() {
         }
         context.startForegroundService(intent)
 
+    }
+
+    fun togglePause(context: Context) {
+        val action = if (uiState.value.isPaused) "RESUME" else "PAUSE"
+        val intent = Intent(context, RideService::class.java).apply {
+            this.action = action
+        }
+        context.startService(intent)
     }
 
     fun updateOngoingRating(context: Context, newRating: Int) {

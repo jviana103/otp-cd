@@ -14,6 +14,7 @@ var NOTIFICATION_REMINDER_INTERVAL = 3 * 60
 
 data class DataScanUiState(
     val isRiding: Boolean = false,
+    val isPaused: Boolean = false,
     val isAwaitingInitialRating: Boolean = false,
     val secondsRemaining: Int = DEFAULT_TIMEOUT,
     val tripId: String? = null,

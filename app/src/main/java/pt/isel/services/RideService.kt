@@ -47,6 +47,7 @@ class RideService() : Service() {
     companion object {
         val secondsRemaining = MutableStateFlow(DEFAULT_TIMEOUT)
         val isServiceRunning = MutableStateFlow(false)
+        val isPaused = MutableStateFlow(false)
         val currentLocation = MutableStateFlow<Location?>(null)
         val currentBluetoothCount = MutableStateFlow(0)
         val currentWifiCount = MutableStateFlow(0)
@@ -83,6 +84,12 @@ class RideService() : Service() {
             "UPDATE_RATING" -> {
                 currentRating = intent.getIntExtra("NEW_RATING", DEFAULT_SUBJ_RATING)
             }
+            "PAUSE" -> {
+                isPaused.value = true
+            }
+            "RESUME" -> {
+                isPaused.value = false
+            }
             else -> {
                 val tripId = intent?.getStringExtra("TRIP_ID") ?: "unknown_${System.currentTimeMillis()}"
                 val transportType = intent?.getStringExtra("TRANSPORT_TYPE") ?: "Unknown"
@@ -110,19 +117,22 @@ class RideService() : Service() {
 
     private fun startRideTicker(tripId: String) {
         isServiceRunning.value = true
+        isPaused.value = false
         serviceScope.launch {
-            for (seconds in DEFAULT_TIMEOUT downTo 0) {
-                secondsRemaining.value = seconds
-
-                notificationHelper.updateTimerNotification(seconds)
-                
-                if ((DEFAULT_TIMEOUT - seconds) % DEFAULT_INTERVAL == 0 && seconds != DEFAULT_TIMEOUT) {
-                    performDataScanAndUpload(tripId)
-                    if ((DEFAULT_TIMEOUT - seconds) % NOTIFICATION_REMINDER_INTERVAL == 0 && seconds != DEFAULT_TIMEOUT) {
-                        notificationHelper.sendRatingReminder()
+            var seconds = DEFAULT_TIMEOUT
+            while (seconds >= 0) {
+                if (!isPaused.value) {
+                    secondsRemaining.value = seconds
+                    notificationHelper.updateTimerNotification(seconds)
+                    
+                    if ((DEFAULT_TIMEOUT - seconds) % DEFAULT_INTERVAL == 0 && seconds != DEFAULT_TIMEOUT) {
+                        performDataScanAndUpload(tripId)
+                        if ((DEFAULT_TIMEOUT - seconds) % NOTIFICATION_REMINDER_INTERVAL == 0 && seconds != DEFAULT_TIMEOUT) {
+                            notificationHelper.sendRatingReminder()
+                        }
                     }
+                    seconds--
                 }
-
                 delay(1.seconds)
             }
             stopSelf()
@@ -198,6 +208,7 @@ class RideService() : Service() {
         bluetoothService.stopScan()
         wifiService.stopScan()
         isServiceRunning.value = false
+        isPaused.value = false
     }
 
     override fun onBind(intent: Intent?): IBinder? = null
