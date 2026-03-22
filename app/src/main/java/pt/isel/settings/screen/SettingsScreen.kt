@@ -56,11 +56,11 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
         SettingsSection(title = "Viagem") {
             SettingsSlider(
                 label = "Tempo de viagem",
-                value = travelTime.toFloat(),
+                value = travelTime.toFloat() / 60,
                 valueRange = 1f..60f,
                 steps = 59,
                 onValueChange = {
-                    viewModel.updateTimeout((it * 60).toInt())
+                    viewModel.updateTimeout((it.roundToInt() * 60))
                 },
                 valueDisplay = "${travelTime / 60} min"
             )

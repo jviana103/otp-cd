@@ -2,20 +2,27 @@ package pt.isel.datascan.viewmodel
 
 import android.content.Context
 import android.content.Intent
+import android.location.Location
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import pt.isel.datascan.domain.ScanReading
 import pt.isel.datascan.domain.TransportationType
+import pt.isel.datascan.viewmodel.state.DEFAULT_INTERVAL
 import pt.isel.datascan.viewmodel.state.DEFAULT_TIMEOUT
 import pt.isel.datascan.viewmodel.state.DataScanUiState
 import pt.isel.services.RideService
 import pt.isel.settings.domain.repository.SettingsRepository
 import java.util.UUID
+import kotlin.time.Duration.Companion.seconds
 
 class DataScanViewModel(private val repository: SettingsRepository) : ViewModel() {
     private val _uiState = MutableStateFlow(DataScanUiState())
@@ -37,6 +44,11 @@ class DataScanViewModel(private val repository: SettingsRepository) : ViewModel(
         viewModelScope.launch {
             RideService.isServiceRunning.collect { running ->
                 _uiState.update { it.copy(isRiding = running) }
+            }
+        }
+        viewModelScope.launch {
+            RideService.isPaused.collect { paused ->
+                _uiState.update { it.copy(isPaused = paused) }
             }
         }
         viewModelScope.launch {
@@ -106,6 +118,14 @@ class DataScanViewModel(private val repository: SettingsRepository) : ViewModel(
             }
             context.startForegroundService(intent)
         }
+    }
+
+    fun togglePause(context: Context) {
+        val action = if (uiState.value.isPaused) "RESUME" else "PAUSE"
+        val intent = Intent(context, RideService::class.java).apply {
+            this.action = action
+        }
+        context.startService(intent)
     }
 
     fun updateOngoingRating(context: Context, newRating: Int) {

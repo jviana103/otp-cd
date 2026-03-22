@@ -1,5 +1,6 @@
 package pt.isel.settings.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
@@ -13,6 +14,7 @@ class SettingsViewModel(private val repository: SettingsRepository) : ViewModel(
     val notificationInterval = repository.notificationInterval
 
     fun updateTimeout(newTimeout: Int) {
+        Log.d("SettingsViewModel", "Updating timeout to $newTimeout")
         viewModelScope.launch { repository.updateTimeout(newTimeout) }
     }
 

@@ -79,7 +79,7 @@ fun DataScanScreen(
                         TransportSelectionBox(
                             type = TransportationType.METRO,
                             isSelected = selectedType == TransportationType.METRO,
-                            iconRes = R.drawable.ic_train,
+                            iconRes = R.drawable.ic_subway,
                             label = "Metro",
                             modifier = Modifier.weight(1f),
                             onSelect = { viewModel.selectTransport(TransportationType.METRO) }
@@ -108,34 +108,48 @@ fun DataScanScreen(
                 }
             } else {
                 Text(
-                    text = "Tempo Restante",
+                    text = if (state.isPaused) "Viagem Pausada" else "Tempo Restante",
                     style = MaterialTheme.typography.labelLarge
                 )
 
                 Text(
                     text = formatTime(state.secondsRemaining),
                     style = MaterialTheme.typography.displayLarge,
-                    color = MaterialTheme.colorScheme.primary
+                    color = if (state.isPaused) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary
                 )
 
-                Text(
-                    text = "A recolher evidências sem fio...",
-                    style = MaterialTheme.typography.bodyMedium
-                )
+                if (!state.isPaused) {
+                    Text(
+                        text = "A recolher evidências sem fio...",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
 
                 Text("Ocupação atual: ${state.currentSubjectiveRating}")
 
-                Text("Dispositivos Bluetooth: ${state.lastRead?.bluetoothCount}")
+                Text("Dispositivos Bluetooth: ${state.lastRead?.bluetoothCount ?: 0}")
 
-                Text("Dispositivos Wi-Fi: ${state.lastRead?.wifiCount}")
+                Text("Dispositivos Wi-Fi: ${state.lastRead?.wifiCount ?: 0}")
 
-                Text("Localização atual: ${state.lastRead?.latitude}, ${state.lastRead?.longitude}")
+                Text("Localização atual: ${state.lastRead?.latitude ?: 0.0}, ${state.lastRead?.longitude ?: 0.0}")
 
-                Button(
-                    onClick = { showUpdateDialog = true },
-                    modifier = Modifier.padding(top = 8.dp)
+                Row(
+                    modifier = Modifier.fillMaxWidth(0.8f),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Text("Alterar Lotação")
+                    Button(
+                        onClick = { viewModel.togglePause(context) },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text(if (state.isPaused) "Retomar" else "Pausar")
+                    }
+
+                    Button(
+                        onClick = { showUpdateDialog = true },
+                        modifier = Modifier.weight(1f)
+                    ) {
+                        Text("Alterar lotação")
+                    }
                 }
 
                 Button(
@@ -143,7 +157,7 @@ fun DataScanScreen(
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.error
                     ),
-                    modifier = Modifier.padding(top = 16.dp)
+                    modifier = Modifier.fillMaxWidth(0.8f)
                 ) {
                     Text("Parar Viagem")
                 }

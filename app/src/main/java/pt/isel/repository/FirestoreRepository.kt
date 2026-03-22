@@ -15,7 +15,7 @@ class FirestoreRepository(
     var isTest: Boolean = IS_TEST_TRIP
 
     private val collectionName: String
-        get() = if (IS_TEST_TRIP) "viagens_teste" else "viagens"
+        get() = if (isTest) "viagens_teste" else "viagens"
 
     fun createTrip(
         tripId: String,

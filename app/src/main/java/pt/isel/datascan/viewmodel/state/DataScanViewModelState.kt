@@ -15,6 +15,7 @@ const val DEFAULT_SUBJ_RATING = 3
 
 data class DataScanUiState(
     val isRiding: Boolean = false,
+    val isPaused: Boolean = false,
     val isAwaitingInitialRating: Boolean = false,
     val secondsRemaining: Int = DEFAULT_TIMEOUT,
     val tripId: String? = null,
