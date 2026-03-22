@@ -10,6 +10,8 @@ activityCompose = "1.12.2"
 composeBom = "2024.09.00"
 playServicesLocation = "21.3.0"
 firebaseBom = "33.9.0"
+datastoreCore = "1.2.1"
+datastore = "1.1.7"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -31,6 +33,8 @@ androidx-compose-material3-adaptive-navigation-suite = { group = "androidx.compo
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }
 firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore" }
+androidx-datastore-core = { group = "androidx.datastore", name = "datastore-core", version.ref = "datastoreCore" }
+androidx-datastore = { group = "androidx.datastore", name="datastore-preferences", version.ref = "datastore" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

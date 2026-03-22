@@ -1,6 +1,7 @@
 package pt.isel
 
 import android.Manifest
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -28,15 +29,39 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.datastore.preferences.preferencesDataStore
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import pt.isel.datascan.screen.DataScanScreen
-import pt.isel.datascan.screen.SettingsScreen
+import pt.isel.settings.screen.SettingsScreen
 import pt.isel.datascan.viewmodel.DataScanViewModel
+import pt.isel.repository.SettingsPreferenceRepository
+import pt.isel.settings.viewmodel.SettingsViewModel
 import pt.isel.ui.theme.FirstAppTheme
+
+private val Context.dataStore by preferencesDataStore(name = "settings")
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val viewModel: DataScanViewModel by viewModels()
+
+        val settingsRepository = SettingsPreferenceRepository(dataStore)
+
+        val dataScanViewModel: DataScanViewModel by viewModels {
+            object : ViewModelProvider.Factory {
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return DataScanViewModel(settingsRepository) as T
+                }
+            }
+        }
+
+        val settingsViewModel: SettingsViewModel by viewModels {
+            object : ViewModelProvider.Factory {
+                override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    return SettingsViewModel(settingsRepository) as T
+                }
+            }
+        }
 
         val permissionLauncher = registerForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions()
@@ -57,7 +82,7 @@ class MainActivity : ComponentActivity() {
                 }
 
                 Surface(modifier = Modifier.fillMaxSize()) {
-                    MainAppContainer(viewModel)
+                    MainAppContainer(dataScanViewModel, settingsViewModel)
                 }
             }
         }
@@ -65,7 +90,10 @@ class MainActivity : ComponentActivity() {
 }
 
 @Composable
-fun MainAppContainer(viewModel: DataScanViewModel) {
+fun MainAppContainer(
+    dataScanViewModel: DataScanViewModel,
+    settingsViewModel: SettingsViewModel
+) {
     var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.HOME) }
     val context = LocalContext.current
 
@@ -86,16 +114,16 @@ fun MainAppContainer(viewModel: DataScanViewModel) {
                 when (currentDestination) {
                     AppDestinations.HOME -> {
                         DataScanScreen(
-                            viewModel = viewModel,
+                            viewModel = dataScanViewModel,
                             onStartService = { rating ->
-                                viewModel.confirmInitialRating(context, rating)
+                                dataScanViewModel.confirmInitialRating(context, rating)
                             },
                             onStopService = {
-                                viewModel.stopRide(context)
+                                dataScanViewModel.stopRide(context)
                             }
                         )
                     }
-                    AppDestinations.SETTINGS -> SettingsScreen()
+                    AppDestinations.SETTINGS -> SettingsScreen(settingsViewModel)
                 }
             }
         }

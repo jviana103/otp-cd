@@ -1,4 +1,4 @@
-package pt.isel.datascan.screen
+package pt.isel.settings.screen
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -16,6 +16,7 @@ import androidx.compose.material3.Slider
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -23,19 +24,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import pt.isel.datascan.viewmodel.state.DEFAULT_INTERVAL
 import pt.isel.datascan.viewmodel.state.DEFAULT_TIMEOUT
 import pt.isel.datascan.viewmodel.state.IS_TEST_TRIP
 import pt.isel.datascan.viewmodel.state.NOTIFICATION_REMINDER_INTERVAL
+import pt.isel.settings.viewmodel.SettingsViewModel
 import kotlin.math.roundToInt
 
 @Composable
-fun SettingsScreen() {
-    var travelTime by remember { mutableFloatStateOf(DEFAULT_TIMEOUT / 60f) }
-    var intervalTime by remember { mutableFloatStateOf(DEFAULT_INTERVAL.toFloat()) }
-    var notificationTime by remember { mutableFloatStateOf(NOTIFICATION_REMINDER_INTERVAL.toFloat()) }
-    var isTestTrip by remember { mutableStateOf(IS_TEST_TRIP) }
+fun SettingsScreen(viewModel: SettingsViewModel) {
+    val travelTime by viewModel.timeout.collectAsState(DEFAULT_TIMEOUT)
+    val intervalTime by viewModel.interval.collectAsState(DEFAULT_INTERVAL)
+    val notificationTime by viewModel.notificationInterval.collectAsState(NOTIFICATION_REMINDER_INTERVAL)
+    val isTestTrip by viewModel.isTestTrip.collectAsState(IS_TEST_TRIP)
 
     Column(
         modifier = Modifier
@@ -53,42 +56,37 @@ fun SettingsScreen() {
         SettingsSection(title = "Viagem") {
             SettingsSlider(
                 label = "Tempo de viagem",
-                value = travelTime,
+                value = travelTime.toFloat(),
                 valueRange = 1f..60f,
                 steps = 59,
                 onValueChange = {
-                    travelTime = it
-                    DEFAULT_TIMEOUT = (it * 60).toInt()
+                    viewModel.updateTimeout((it * 60).toInt())
                 },
-                valueDisplay = "${travelTime.toInt()} min"
+                valueDisplay = "${travelTime / 60} min"
             )
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
             SettingsSlider(
                 label = "Intervalo entre leituras",
-                value = intervalTime,
+                value = intervalTime.toFloat(),
                 valueRange = 5f..120f,
                 steps = 115,
                 onValueChange = {
-                    val roundedValue = it.roundToInt()
-                    intervalTime = roundedValue.toFloat()
-                    DEFAULT_INTERVAL = roundedValue
+                    viewModel.updateInterval(it.roundToInt())
                 },
-                valueDisplay = "${intervalTime.toInt()} seg"
+                valueDisplay = "$intervalTime seg"
             )
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
 
             SettingsSlider(
                 label = "Intervalo entre notificações",
-                value = notificationTime,
+                value = notificationTime.toFloat(),
                 valueRange = 30f..300f,
                 steps = 26,
                 onValueChange = {
-                    val roundedValue = it.roundToInt()
-                    notificationTime = roundedValue.toFloat()
-                    NOTIFICATION_REMINDER_INTERVAL = roundedValue
+                    viewModel.updateNotificationInterval(it.roundToInt())
                 },
                 valueDisplay = "${notificationTime.toInt()} seg"
             )
@@ -100,8 +98,7 @@ fun SettingsScreen() {
                 description = "Se ativo, os dados serão guardados na coleção 'viagens_teste'",
                 checked = isTestTrip,
                 onCheckedChange = {
-                    isTestTrip = it
-                    IS_TEST_TRIP = it
+                    viewModel.updateIsTestTrip(it)
                 }
             )
         }

@@ -4,17 +4,17 @@ package pt.isel.datascan.viewmodel.state
 import pt.isel.datascan.domain.ScanReading
 
 
-var DEFAULT_TIMEOUT = 15 * 60
-var DEFAULT_INTERVAL = 30
-var IS_TEST_TRIP = false
+const val DEFAULT_TIMEOUT = 15 * 60
+const val DEFAULT_INTERVAL = 30
+const val IS_TEST_TRIP = false
+
+const val NOTIFICATION_REMINDER_INTERVAL = 3 * 60
 
 const val DEFAULT_SUBJ_RATING = 3
 
-var NOTIFICATION_REMINDER_INTERVAL = 3 * 60
 
 data class DataScanUiState(
     val isRiding: Boolean = false,
-    val isPaused: Boolean = false,
     val isAwaitingInitialRating: Boolean = false,
     val secondsRemaining: Int = DEFAULT_TIMEOUT,
     val tripId: String? = null,
