@@ -199,7 +199,7 @@ fun DataScanScreen(
                 onConfirm = onStartService,
                 onDismiss = {
                     viewModel.cancelStart()
-                    showUpdateDialog = false;
+                    showUpdateDialog = false
                 }
             )
         }
