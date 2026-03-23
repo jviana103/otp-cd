@@ -32,6 +32,7 @@ import pt.isel.repository.FirestoreRepository
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 class RideService() : Service() {
@@ -97,9 +98,15 @@ class RideService() : Service() {
             }
             "PAUSE" -> {
                 isPaused.value = true
+                locationService.stopLocationUpdates()
+                bluetoothService.stopScan()
+                wifiService.stopScan()
             }
             "RESUME" -> {
                 isPaused.value = false
+                locationService.startLocationUpdates()
+                bluetoothService.startScan()
+                wifiService.startScan()
             }
             else -> {
                 currentTimeout = intent?.getIntExtra("TIMEOUT", DEFAULT_TIMEOUT) ?: DEFAULT_TIMEOUT
@@ -139,25 +146,31 @@ class RideService() : Service() {
         isServiceRunning.value = true
         isPaused.value = false
         serviceScope.launch {
-            for (seconds in currentTimeout downTo 0) {
-                if (!isPaused.value) {
-                    secondsRemaining.value = seconds
+            var seconds = currentTimeout
 
-                    notificationHelper.updateTimerNotification(seconds)
+            while (seconds >= 0) {
+                if (isPaused.value) {
+                    delay(500.milliseconds)
+                    continue
+                }
 
-                    val elapsedTime = currentTimeout - seconds
+                secondsRemaining.value = seconds
+                notificationHelper.updateTimerNotification(seconds)
 
-                    if (elapsedTime % currentScanInterval == 0 && seconds != currentTimeout) {
-                        performDataScanAndUpload(tripId)
-                    }
+                val elapsedTime = currentTimeout - seconds
 
-                    if (elapsedTime % currentNotifInterval == 0 && seconds != currentTimeout) {
-                        notificationHelper.sendRatingReminder()
-                    }
+                if (elapsedTime % currentScanInterval == 0 && seconds != currentTimeout) {
+                    performDataScanAndUpload(tripId)
+                }
+
+                if (elapsedTime % currentNotifInterval == 0 && seconds != currentTimeout) {
+                    notificationHelper.sendRatingReminder()
                 }
 
                 delay(1.seconds)
+                seconds--
             }
+
             stopSelf()
         }
     }
