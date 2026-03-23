@@ -1,3 +1,60 @@
 <resources>
     <string name="app_name">OTP-CD</string>
+    <string name="nav_home">Início</string>
+    <string name="nav_settings">Definições</string>
+
+    <string name="dialog_occupancy_title">Lotação do Transporte</string>
+    <string name="dialog_occupancy_question">Como classificaria a ocupação atual?</string>
+    <string name="dialog_finish_trip_title">Finalizar Viagem?</string>
+    <string name="dialog_finish_trip_message">Deseja terminar a viagem?</string>
+
+    <string name="button_start_trip">Iniciar Viagem</string>
+    <string name="button_cancel">Cancelar</string>
+    <string name="button_confirm">Confirmar</string>
+    <string name="button_start_collection">Iniciar Recolha</string>
+
+    <string name="label_select_transport">Selecione o meio de transporte:</string>
+    <string name="label_metro">Metro</string>
+    <string name="label_train">Comboio</string>
+    <string name="label_occupancy_empty">Vazio</string>
+    <string name="label_occupancy_full">Muito Cheio</string>
+
+    <string name="label_trip_paused">Viagem Pausada</string>
+    <string name="label_time_remaining_header">Tempo Restante</string>
+    <string name="label_collecting_evidence">A recolher evidências sem fio…</string>
+    <string name="label_current_occupancy">Ocupação atual: %1$d</string>
+    <string name="label_bluetooth_devices">Dispositivos Bluetooth: %1$d</string>
+    <string name="label_wifi_devices">Dispositivos Wi-Fi: %1$d</string>
+    <string name="label_current_location">Localização atual: %1$f, %2$f</string>
+
+    <string name="btn_resume">Retomar</string>
+    <string name="btn_pause">Pausar</string>
+    <string name="btn_change_occupancy">Alterar lotação</string>
+    <string name="btn_stop_trip">Parar Viagem</string>
+    <string name="btn_start_trip">Iniciar Viagem</string>
+    <string name="btn_confirm">Confirmar</string>
+    <string name="btn_cancel">Cancelar</string>
+    <string name="btn_confirm_stop">Sim, Parar</string>
+
+    <string name="notif_channel_alerts">Alertas</string>
+    <string name="notif_channel_monitoring">Monitorização</string>
+
+    <string name="notif_timer_title">Viagem em Curso</string>
+    <string name="notif_timer_content">Tempo restante: %1$s</string>
+
+    <string name="notif_reminder_title">Atualizar Lotação?</string>
+    <string name="notif_reminder_content">A ocupação mudou? Toque para atualizar.</string>
+
+    <string name="settings_title">Configurações</string>
+    <string name="section_trip">Viagem</string>
+    <string name="section_development">Desenvolvimento</string>
+
+    <string name="label_travel_time">Tempo de viagem</string>
+    <string name="label_scan_interval">Intervalo entre leituras</string>
+    <string name="label_notification_interval">Intervalo entre notificações</string>
+    <string name="label_test_trip">Viagem de Teste</string>
+    <string name="desc_test_trip">Se ativo, os dados serão guardados na coleção \'viagens_teste\'</string>
+
+    <string name="unit_minutes">%1$d min</string>
+    <string name="unit_seconds">%1$d seg</string>
 </resources>

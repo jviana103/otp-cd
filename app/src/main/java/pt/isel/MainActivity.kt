@@ -8,6 +8,7 @@ import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
+import androidx.annotation.StringRes
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -28,6 +29,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.ViewModel
@@ -101,8 +103,8 @@ fun MainAppContainer(
         navigationSuiteItems = {
             AppDestinations.entries.forEach { destination ->
                 item(
-                    icon = { Icon(destination.icon, contentDescription = destination.label) },
-                    label = { Text(destination.label) },
+                    icon = { Icon(destination.icon, contentDescription = null) },
+                    label = { Text(stringResource(destination.label)) },
                     selected = destination == currentDestination,
                     onClick = { currentDestination = destination }
                 )
@@ -131,11 +133,11 @@ fun MainAppContainer(
 }
 
 enum class AppDestinations(
-    val label: String,
+    @param:StringRes val label: Int,
     val icon: ImageVector,
 ) {
-    HOME("Home", Icons.Default.Home),
-    SETTINGS("Settings", Icons.Default.Settings),
+    HOME(R.string.nav_home, Icons.Default.Home),
+    SETTINGS(R.string.nav_settings, Icons.Default.Settings),
 }
 
 @Composable

@@ -19,8 +19,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import pt.isel.R
 import pt.isel.datascan.viewmodel.state.DEFAULT_SUBJ_RATING
 
 @Composable
@@ -33,10 +35,10 @@ fun RatingDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(text = "Lotação do Transporte") },
+        title = { Text(text = stringResource(id = R.string.dialog_occupancy_title)) },
         text = {
             Column {
-                Text("Como classificaria a ocupação atual?")
+                Text(text = stringResource(id = R.string.dialog_occupancy_question))
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Row(
@@ -56,19 +58,19 @@ fun RatingDialog(
                     modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
-                    Text("Vazio", style = MaterialTheme.typography.bodySmall)
-                    Text("Muito Cheio", style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(id = R.string.label_occupancy_empty), style = MaterialTheme.typography.bodySmall)
+                    Text(stringResource(id = R.string.label_occupancy_full), style = MaterialTheme.typography.bodySmall)
                 }
             }
         },
         confirmButton = {
             Button(onClick = { onConfirm(selectedRating) }) {
-                Text("Iniciar Viagem")
+                Text(stringResource(id = R.string.button_start_trip))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Cancelar")
+                Text(stringResource(id = R.string.button_cancel))
             }
         }
     )

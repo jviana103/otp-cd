@@ -23,6 +23,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -67,7 +68,7 @@ fun DataScanScreen(
                     modifier = Modifier.padding(16.dp)
                 ) {
                     Text(
-                        text = "Selecione o meio de transporte:",
+                        text = stringResource(R.string.label_select_transport),
                         style = MaterialTheme.typography.titleMedium,
                         modifier = Modifier.padding(bottom = 20.dp)
                     )
@@ -80,7 +81,7 @@ fun DataScanScreen(
                             type = TransportationType.METRO,
                             isSelected = selectedType == TransportationType.METRO,
                             iconRes = R.drawable.ic_subway,
-                            label = "Metro",
+                            label = stringResource(R.string.label_metro),
                             modifier = Modifier.weight(1f),
                             onSelect = { viewModel.selectTransport(TransportationType.METRO) }
                         )
@@ -89,7 +90,7 @@ fun DataScanScreen(
                             type = TransportationType.TRAIN,
                             isSelected = selectedType == TransportationType.TRAIN,
                             iconRes = R.drawable.ic_train,
-                            label = "Comboio",
+                            label = stringResource(R.string.label_train),
                             modifier = Modifier.weight(1f),
                             onSelect = { viewModel.selectTransport(TransportationType.TRAIN) }
                         )
@@ -103,12 +104,14 @@ fun DataScanScreen(
                         modifier = Modifier.height(56.dp).fillMaxWidth(0.8f),
                         shape = RoundedCornerShape(28.dp)
                     ) {
-                        Text("Iniciar Recolha")
+                        Text(stringResource(R.string.button_start_collection))
                     }
                 }
             } else {
                 Text(
-                    text = if (state.isPaused) "Viagem Pausada" else "Tempo Restante",
+                    text =
+                        if (state.isPaused) stringResource(R.string.label_trip_paused)
+                        else stringResource(R.string.label_time_remaining_header),
                     style = MaterialTheme.typography.labelLarge
                 )
 
@@ -120,18 +123,18 @@ fun DataScanScreen(
 
                 if (!state.isPaused) {
                     Text(
-                        text = "A recolher evidências sem fio...",
+                        text = stringResource(R.string.label_collecting_evidence),
                         style = MaterialTheme.typography.bodyMedium
                     )
                 }
 
-                Text("Ocupação atual: ${state.currentSubjectiveRating}")
+                Text(stringResource(R.string.label_current_occupancy, state.currentSubjectiveRating))
 
-                Text("Dispositivos Bluetooth: ${state.lastRead?.bluetoothCount ?: 0}")
+                Text(stringResource(R.string.label_bluetooth_devices, state.lastRead?.bluetoothCount ?: 0))
 
-                Text("Dispositivos Wi-Fi: ${state.lastRead?.wifiCount ?: 0}")
+                Text(stringResource(R.string.label_wifi_devices, state.lastRead?.wifiCount ?: 0))
 
-                Text("Localização atual: ${state.lastRead?.latitude ?: 0.0}, ${state.lastRead?.longitude ?: 0.0}")
+                Text(stringResource(R.string.label_current_location, state.lastRead?.latitude ?: 0.0, state.lastRead?.longitude ?: 0.0))
 
                 Row(
                     modifier = Modifier.fillMaxWidth(0.8f),
@@ -141,14 +144,16 @@ fun DataScanScreen(
                         onClick = { viewModel.togglePause(context) },
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text(if (state.isPaused) "Retomar" else "Pausar")
+                        Text(
+                            if (state.isPaused) stringResource(R.string.btn_resume)
+                            else stringResource(R.string.btn_pause))
                     }
 
                     Button(
                         onClick = { showUpdateDialog = true },
                         modifier = Modifier.weight(1f)
                     ) {
-                        Text("Alterar lotação")
+                        Text(stringResource(R.string.btn_change_occupancy))
                     }
                 }
 
@@ -159,7 +164,7 @@ fun DataScanScreen(
                     ),
                     modifier = Modifier.fillMaxWidth(0.8f)
                 ) {
-                    Text("Parar Viagem")
+                    Text(stringResource(R.string.btn_stop_trip))
                 }
             }
         }
@@ -177,9 +182,9 @@ fun DataScanScreen(
 
         if (showStopConfirmation) {
             ConfirmationDialog(
-                title = "Finalizar Viagem?",
-                message = "Deseja terminar a viagem?",
-                confirmText = "Sim, Parar",
+                title = stringResource(R.string.dialog_finish_trip_title),
+                message = stringResource(R.string.dialog_finish_trip_message),
+                confirmText = stringResource(R.string.btn_confirm_stop),
                 isDestructive = true,
                 onConfirm = {
                     showStopConfirmation = false

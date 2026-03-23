@@ -6,6 +6,8 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import androidx.core.app.NotificationCompat
 import pt.isel.MainActivity
 import pt.isel.R
@@ -24,7 +26,11 @@ class NotificationHelper(private val context: Context) {
         autoCancel: Boolean = false
     ): NotificationCompat.Builder {
 
-        val name = if (importance == NotificationManager.IMPORTANCE_HIGH) "Alertas" else "Monitorização"
+        val name =
+            if (importance == NotificationManager.IMPORTANCE_HIGH)
+                context.getString(R.string.notif_channel_alerts)
+            else context.getString(R.string.notif_channel_monitoring)
+
         val channel = NotificationChannel(channelId, name, importance)
         notificationManager.createNotificationChannel(channel)
 
@@ -48,9 +54,9 @@ class NotificationHelper(private val context: Context) {
     }
 
     fun createTimerNotification(seconds: Int): Notification {
-        val timeText = "Tempo restante: ${formatTime(seconds)}"
+        val timeText = context.getString(R.string.notif_timer_content, formatTime(seconds))
         return buildBaseNotification(
-            title = "Viagem em Curso",
+            title = context.getString(R.string.notif_timer_title),
             text = timeText,
             channelId = "ride_service_channel",
             importance = NotificationManager.IMPORTANCE_LOW,
@@ -60,8 +66,8 @@ class NotificationHelper(private val context: Context) {
 
     fun sendRatingReminder() {
         val notification = buildBaseNotification(
-            title = "Atualizar Lotação?",
-            text = "A ocupação mudou? Toque para atualizar.",
+            title = context.getString(R.string.notif_reminder_title),
+            text = context.getString(R.string.notif_reminder_content),
             channelId = "rating_reminder_channel",
             importance = NotificationManager.IMPORTANCE_HIGH,
             isOngoing = false,
@@ -74,7 +80,6 @@ class NotificationHelper(private val context: Context) {
         notificationManager.notify(2, notification)
     }
 
-    // Function to update the existing foreground notification
     fun updateTimerNotification(seconds: Int) {
         notificationManager.notify(1, createTimerNotification(seconds))
     }
