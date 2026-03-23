@@ -116,7 +116,7 @@ class RideService() : Service() {
 
                 secondsRemaining.value = currentTimeout
 
-                startForeground(1, createNotificationWithTime(currentTimeout))
+                startForeground(1, notificationHelper.createTimerNotification(currentTimeout))
 
                 val trip = TripData(
                     transportType = transportType,
@@ -160,38 +160,6 @@ class RideService() : Service() {
             }
             stopSelf()
         }
-    }
-
-    private fun createNotificationWithTime(seconds: Int): Notification {
-        val channelId = "ride_service_channel"
-        val minutes = seconds / 60
-        val secs = seconds % 60
-        val timeText = "Tempo restante: $minutes:$secs"
-
-        val manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
-        val channel = NotificationChannel(
-            channelId,
-            "Monitorização de Transporte",
-            NotificationManager.IMPORTANCE_LOW
-        )
-        manager.createNotificationChannel(channel)
-
-        val intent = Intent(this, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP
-        }
-        val pendingIntent = PendingIntent.getActivity(
-            this, 0, intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
-
-        return NotificationCompat.Builder(this, channelId)
-            .setContentTitle("Viagem em Curso")
-            .setContentText(timeText)
-            .setSmallIcon(R.drawable.ic_train)
-            .setOngoing(true)
-            .setContentIntent(pendingIntent)
-            .setOnlyAlertOnce(true)
-            .build()
     }
 
     private fun performDataScanAndUpload(tripId: String) {
