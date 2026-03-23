@@ -21,12 +21,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import pt.isel.R
 import pt.isel.datascan.viewmodel.state.DEFAULT_INTERVAL
 import pt.isel.datascan.viewmodel.state.DEFAULT_TIMEOUT
 import pt.isel.datascan.viewmodel.state.IS_TEST_TRIP
 import pt.isel.datascan.viewmodel.state.NOTIFICATION_REMINDER_INTERVAL
+import pt.isel.settings.domain.repository.MockSettingsRepository
 import pt.isel.settings.viewmodel.SettingsViewModel
 import kotlin.math.roundToInt
 
@@ -59,7 +61,7 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
                 onValueChange = {
                     viewModel.updateTimeout((it.roundToInt() * 60))
                 },
-                valueDisplay = stringResource(R.string.unit_minutes, travelTime)
+                valueDisplay = stringResource(R.string.unit_minutes, travelTime / 60)
             )
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
@@ -179,4 +181,11 @@ fun SettingsToggle(
             onCheckedChange = onCheckedChange
         )
     }
+}
+
+@Preview
+@Composable
+fun SettingsScreenPreview() {
+    val mockRepo = MockSettingsRepository()
+    SettingsScreen(viewModel = SettingsViewModel(mockRepo))
 }
