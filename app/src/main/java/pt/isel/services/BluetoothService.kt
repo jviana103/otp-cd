@@ -10,6 +10,7 @@ import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -17,17 +18,20 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 
 class BluetoothService(private val context: Context) {
         private val bluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         private val bluetoothAdapter: BluetoothAdapter? = bluetoothManager.adapter
+
+        private val bluetoothScanTime : Long = 10_000
 
         private val _deviceCount = MutableStateFlow(0)
         val deviceCount: StateFlow<Int> = _deviceCount.asStateFlow()
 
         private val discoveredDevices = MutableStateFlow<Map<String, Int>>(emptyMap())
 
-        private val serviceScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+        private val serviceScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
         val strongestSignals: StateFlow<List<Int>> = discoveredDevices
             .map { devices ->
                 devices.values
@@ -61,17 +65,21 @@ class BluetoothService(private val context: Context) {
         }
 
         scanner.startScan(scanCallback)
+
+        serviceScope.launch {
+            delay(bluetoothScanTime)
+            stopScan()
+        }
     }
 
     fun clearScan() {
         discoveredDevices.value = emptyMap()
         _deviceCount.value = 0
+
     }
 
     @SuppressLint("MissingPermission")
     fun stopScan() {
         bluetoothAdapter?.bluetoothLeScanner?.stopScan(scanCallback)
-        discoveredDevices.value = emptyMap()
-        _deviceCount.value = 0
     }
 }

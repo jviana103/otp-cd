@@ -177,6 +177,7 @@ class RideService() : Service() {
             val bluetoothCount = bluetoothService.deviceCount.value
             val signalIntensitiesBT = bluetoothService.strongestSignals.value
             bluetoothService.clearScan()
+            bluetoothService.startScan()
 
             val wifiCount = wifiService.wifiCount.value
             wifiService.requestNewScan()
