@@ -21,9 +21,7 @@ import pt.isel.datascan.viewmodel.state.IS_TEST_TRIP
 import pt.isel.datascan.viewmodel.state.NOTIFICATION_REMINDER_INTERVAL
 import pt.isel.helpers.NotificationHelper
 import pt.isel.repository.FirestoreRepository
-import java.text.SimpleDateFormat
 import java.util.Date
-import java.util.Locale
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
@@ -119,7 +117,7 @@ class RideService() : Service() {
 
                 val trip = TripData(
                     transportType = transportType,
-                    startDate = SimpleDateFormat("dd-MM-yyyy HH:mm:ss", Locale.getDefault()).format(Date())
+                    startDate = Date()
                 )
 
                 firestoreRepository.createTrip(tripId = tripId, trip = trip, onSuccess = {

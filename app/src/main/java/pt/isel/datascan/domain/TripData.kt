@@ -1,10 +1,12 @@
 package pt.isel.datascan.domain
 
+import java.util.Date
+
 data class TripData (
     val transportType: String = "Unknown",
-    val startDate : String
+    val startDate: Date
 ) {
-    fun toMap() : Map<String, String> = mapOf(
+    fun toMap() : Map<String, Any> = mapOf(
         "transportType" to transportType,
         "startDate" to startDate
     )

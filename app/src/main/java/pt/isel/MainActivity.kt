@@ -52,6 +52,7 @@ class MainActivity : ComponentActivity() {
         val dataScanViewModel: DataScanViewModel by viewModels {
             object : ViewModelProvider.Factory {
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    @Suppress("UNCHECKED_CAST")
                     return DataScanViewModel(settingsRepository) as T
                 }
             }
@@ -60,6 +61,7 @@ class MainActivity : ComponentActivity() {
         val settingsViewModel: SettingsViewModel by viewModels {
             object : ViewModelProvider.Factory {
                 override fun <T : ViewModel> create(modelClass: Class<T>): T {
+                    @Suppress("UNCHECKED_CAST")
                     return SettingsViewModel(settingsRepository) as T
                 }
             }
