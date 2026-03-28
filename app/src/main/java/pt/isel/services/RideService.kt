@@ -9,6 +9,7 @@ import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -172,17 +173,18 @@ class RideService() : Service() {
         serviceScope.launch {
             Log.d("RideService", "Performing data scan and uploading for trip $tripId")
 
-            val networkMetrics = networkService.measureNetworkMetrics()
-            val cellularMetrics = cellularService.getCurrentMetrics()
-
             val location = locationService.currentLocation.value
             val bluetoothCount = bluetoothService.deviceCount.value
             val signalIntensitiesBT = bluetoothService.strongestSignals.value
+            val wifiCount = wifiService.wifiCount.value
+            val cellularMetrics = cellularService.getCurrentMetrics()
+
             bluetoothService.clearScan()
             bluetoothService.startScan()
-
-            val wifiCount = wifiService.wifiCount.value
             wifiService.requestNewScan()
+
+            val networkMetricsDeferred = async { networkService.measureNetworkMetrics() }
+            val networkMetrics = networkMetricsDeferred.await()
 
             val reading = ScanReading(
                 signalIntensitiesBT = signalIntensitiesBT,
