@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -49,8 +51,6 @@ fun DataScanScreen(
 
     var showUpdateDialog by remember { mutableStateOf(false) }
     var showStopConfirmation by remember { mutableStateOf(false) }
-
-    val selectedType by viewModel.selectedTransport.collectAsState()
 
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -177,6 +177,28 @@ fun DataScanScreen(
                     showUpdateDialog = false
                 },
                 onDismiss = { showUpdateDialog = false }
+            )
+        }
+
+        if (state.finishedTripIdToConfirm != null) {
+            AlertDialog(
+                onDismissRequest = {  },
+                properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
+                title = { Text(text = stringResource(R.string.dialog_stayed_inside_title)) },
+                text = { Text(text = stringResource(R.string.dialog_stayed_inside_message)) },
+                confirmButton = {
+                    Button(onClick = { viewModel.handleTripConfirmation(context, stayedInside = true) }) {
+                        Text(stringResource(R.string.btn_yes))
+                    }
+                },
+                dismissButton = {
+                    Button(
+                        onClick = { viewModel.handleTripConfirmation(context, stayedInside = false) },
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
+                    ) {
+                        Text(stringResource(R.string.btn_no))
+                    }
+                }
             )
         }
 

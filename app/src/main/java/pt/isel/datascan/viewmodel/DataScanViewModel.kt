@@ -70,6 +70,11 @@ class DataScanViewModel(private val repository: SettingsRepository) : ViewModel(
                 }
             }
         }
+        viewModelScope.launch {
+            RideService.finishedTripId.collect { tripId ->
+                _uiState.update { it.copy(finishedTripIdToConfirm = tripId) }
+            }
+        }
     }
 
     fun startRide() {
@@ -141,6 +146,26 @@ class DataScanViewModel(private val repository: SettingsRepository) : ViewModel(
         }
 
         context.startService(intent)
+    }
+
+    fun handleTripConfirmation(context: Context, stayedInside: Boolean) {
+        val tripId = uiState.value.finishedTripIdToConfirm
+        val appContext = context.applicationContext
+
+        if (tripId != null && !stayedInside) {
+            viewModelScope.launch {
+                val isTest = repository.isTestTrip.first()
+                val intent = Intent(appContext, RideService::class.java).apply {
+                    action = "DELETE_TRIP"
+                    putExtra("TRIP_ID", tripId)
+                    putExtra("IS_TEST", isTest)
+                }
+                appContext.startService(intent)
+            }
+        }
+
+        _uiState.update { it.copy(finishedTripIdToConfirm = null) }
+        RideService.finishedTripId.value = null
     }
 
     fun stopRide(context: Context) {

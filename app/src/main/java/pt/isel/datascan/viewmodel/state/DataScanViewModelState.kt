@@ -20,5 +20,6 @@ data class DataScanUiState(
     val secondsRemaining: Int = DEFAULT_TIMEOUT,
     val tripId: String? = null,
     val currentSubjectiveRating: Int = DEFAULT_SUBJ_RATING,
-    val lastRead: ScanReading? = null
+    val lastRead: ScanReading? = null,
+    val finishedTripIdToConfirm: String? = null
 )

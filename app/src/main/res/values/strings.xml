@@ -27,6 +27,9 @@
     <string name="label_wifi_devices">Dispositivos Wi-Fi: %1$d</string>
     <string name="label_current_location">Localização atual: %1$f, %2$f</string>
 
+    <string name="dialog_stayed_inside_title">Confirmação para a segurança dos dados</string>
+    <string name="dialog_stayed_inside_message">Ficou dentro do transporte durante toda a coleta de dados?</string>
+
     <string name="btn_resume">Retomar</string>
     <string name="btn_pause">Pausar</string>
     <string name="btn_change_occupancy">Alterar lotação</string>
@@ -35,6 +38,8 @@
     <string name="btn_confirm">Confirmar</string>
     <string name="btn_cancel">Cancelar</string>
     <string name="btn_confirm_stop">Sim, Parar</string>
+    <string name="btn_yes">Sim</string>
+    <string name="btn_no">Não</string>
 
     <string name="notif_channel_alerts">Alertas</string>
     <string name="notif_channel_monitoring">Monitorização</string>

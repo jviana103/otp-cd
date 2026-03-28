@@ -3,7 +3,6 @@ package pt.isel.services
 import android.app.Service
 import android.content.Intent
 import android.location.Location
-import android.net.wifi.ScanResult
 import android.os.IBinder
 import android.util.Log
 import kotlinx.coroutines.CoroutineScope
@@ -54,7 +53,9 @@ class RideService() : Service() {
         val currentLocation = MutableStateFlow<Location?>(null)
         val currentBluetoothCount = MutableStateFlow(0)
         val currentWifiCount = MutableStateFlow(0)
-        val currentScanResults = MutableStateFlow<List<ScanResult>>(emptyList())
+        val finishedTripId = MutableStateFlow<String?>(null)
+        var currentTripId: String? = null
+        //val currentScanResults = MutableStateFlow<List<ScanResult>>(emptyList())
     }
 
     override fun onCreate() {
@@ -87,6 +88,21 @@ class RideService() : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         when (intent?.action) {
+            "DELETE_TRIP" -> {
+                val tripIdToDelete = intent.getStringExtra("TRIP_ID")
+                isTestTrip = intent.getBooleanExtra("IS_TEST", IS_TEST_TRIP)
+                firestoreRepository.isTest = isTestTrip
+
+                if (tripIdToDelete != null) {
+                    firestoreRepository.deleteTrip(tripIdToDelete,
+                        onSuccess = { stopSelf() },
+                        onFailure = { stopSelf() }
+                    )
+                } else {
+                    stopSelf()
+                }
+                return START_NOT_STICKY
+            }
             "UPDATE_RATING" -> {
                 currentRating = intent.getIntExtra("NEW_RATING", DEFAULT_SUBJ_RATING)
             }
@@ -111,6 +127,7 @@ class RideService() : Service() {
                 firestoreRepository.isTest = isTestTrip
 
                 val tripId = intent?.getStringExtra("TRIP_ID") ?: "unknown_${System.currentTimeMillis()}"
+                currentTripId = tripId
                 val transportType = intent?.getStringExtra("TRANSPORT_TYPE") ?: "Unknown"
                 currentRating = intent?.getIntExtra("RATING", DEFAULT_SUBJ_RATING)
                     ?: DEFAULT_SUBJ_RATING
@@ -209,9 +226,16 @@ class RideService() : Service() {
     override fun onDestroy() {
         super.onDestroy()
         serviceJob.cancel()
-        locationService.stopLocationUpdates()
-        bluetoothService.stopScan()
-        wifiService.stopScan()
+
+        if (currentTripId != null) {
+            locationService.stopLocationUpdates()
+            bluetoothService.stopScan()
+            wifiService.stopScan()
+
+            finishedTripId.value = currentTripId
+            currentTripId = null
+        }
+
         isServiceRunning.value = false
         isPaused.value = false
     }
