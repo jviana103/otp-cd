@@ -11,6 +11,7 @@ import kotlin.math.sqrt
 class NetworkService {
 
     data class NetworkMetrics(
+        val latencyAvg: Double,
         val latencyStdDev: Double,
         val packetLoss: Double
     )
@@ -41,9 +42,11 @@ class NetworkService {
         }
 
         val packetLoss = if (count > 0) (count - packetsReceived).toDouble() / count else 0.0
+        val avg = if (latencies.isNotEmpty()) latencies.average() else 0.0
         val stdDev = if (latencies.size >= 2) calculateStandardDeviation(latencies) else 0.0
 
         NetworkMetrics(
+            latencyAvg = avg,
             latencyStdDev = stdDev,
             packetLoss = packetLoss
         )

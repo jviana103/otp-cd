@@ -192,6 +192,7 @@ class RideService() : Service() {
                 bluetoothCount = bluetoothCount,
                 latitude = location?.latitude,
                 longitude = location?.longitude,
+                latencyAvg = networkMetrics.latencyAvg,
                 latencyStdDev = networkMetrics.latencyStdDev,
                 packetLoss = networkMetrics.packetLoss,
                 subjectiveRating = currentRating,
