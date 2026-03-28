@@ -2,28 +2,19 @@ package pt.isel.datascan.viewmodel
 
 import android.content.Context
 import android.content.Intent
-import android.location.Location
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import pt.isel.datascan.domain.ScanReading
 import pt.isel.datascan.domain.TransportationType
-import pt.isel.datascan.viewmodel.state.DEFAULT_INTERVAL
-import pt.isel.datascan.viewmodel.state.DEFAULT_TIMEOUT
 import pt.isel.datascan.viewmodel.state.DataScanUiState
 import pt.isel.services.RideService
 import pt.isel.settings.domain.repository.SettingsRepository
 import java.util.UUID
-import kotlin.time.Duration.Companion.seconds
-
 class DataScanViewModel(private val repository: SettingsRepository) : ViewModel() {
     private val _uiState = MutableStateFlow(DataScanUiState())
     var uiState = _uiState.asStateFlow()
@@ -91,6 +82,8 @@ class DataScanViewModel(private val repository: SettingsRepository) : ViewModel(
 
     fun confirmInitialRating(context: Context, rating: Int) {
         viewModelScope.launch {
+            if (!checkBluetoothConnection(context)) return@launch
+
             val newTripId = "trip_${UUID.randomUUID()}"
 
             val currentTimeout = repository.timeout.first()
@@ -118,6 +111,17 @@ class DataScanViewModel(private val repository: SettingsRepository) : ViewModel(
             }
             context.startForegroundService(intent)
         }
+    }
+
+    fun checkBluetoothConnection(context: Context) : Boolean{
+        val bluetoothManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as android.bluetooth.BluetoothManager
+        val isBluetoothOn = bluetoothManager.adapter?.isEnabled == true
+
+        if (!isBluetoothOn) {
+            android.widget.Toast.makeText(context, "Ligue o Bluetooth para iniciar o scan!", android.widget.Toast.LENGTH_SHORT).show()
+            return false
+        }
+        return true
     }
 
     fun togglePause(context: Context) {
