@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.telephony.CellInfo
 import android.telephony.CellInfoLte
 import android.telephony.CellInfoNr
+import android.telephony.CellSignalStrengthLte
 import android.telephony.CellSignalStrengthNr
 import android.telephony.TelephonyManager
 import androidx.core.content.ContextCompat
@@ -18,8 +19,7 @@ class CellularService(private val context: Context) {
     data class CellularMetrics(
         val rsrp: Int? = null,
         val rssnr: Int? = null,
-        val rsrq: Int? = null,
-        val cqi: Int? = null
+        val rsrq: Int? = null
     )
 
     @SuppressLint("MissingPermission")
@@ -32,29 +32,35 @@ class CellularService(private val context: Context) {
             telephonyManager.allCellInfo
         } catch (e: Exception) {
             null
-        } ?: return CellularMetrics()
+        } ?: emptyList()
 
         val registeredCell = allCellInfo.firstOrNull { it.isRegistered } ?: return CellularMetrics()
 
+        val currentSignalStrength = telephonyManager.signalStrength
+        val signalStrengths = currentSignalStrength?.cellSignalStrengths ?: emptyList()
+
         return when (registeredCell) {
             is CellInfoLte -> {
-                val signal = registeredCell.cellSignalStrength
+                val lteSignal = signalStrengths.filterIsInstance<CellSignalStrengthLte>().firstOrNull() 
+                    ?: registeredCell.cellSignalStrength
+
                 CellularMetrics(
-                    rsrp = signal.rsrp.takeIf { it != CellInfo.UNAVAILABLE },
-                    rssnr = signal.rssnr.takeIf { it != CellInfo.UNAVAILABLE },
-                    rsrq = signal.rsrq.takeIf { it != CellInfo.UNAVAILABLE },
-                    cqi = signal.cqi.takeIf { it != CellInfo.UNAVAILABLE }
+                    rsrp = lteSignal.rsrp.takeIf { it != CellInfo.UNAVAILABLE },
+                    rssnr = lteSignal.rssnr.takeIf { it != CellInfo.UNAVAILABLE },
+                    rsrq = lteSignal.rsrq.takeIf { it != CellInfo.UNAVAILABLE }
                 )
             }
             is CellInfoNr -> {
-                val signal = registeredCell.cellSignalStrength as CellSignalStrengthNr
-                val cqiList = signal.csiCqiReport
-                val widebandCqi = cqiList.firstOrNull()?.takeIf { it != CellInfo.UNAVAILABLE }
+                val nrSignal = signalStrengths.filterIsInstance<CellSignalStrengthNr>().firstOrNull()
+                    ?: (registeredCell.cellSignalStrength as CellSignalStrengthNr)
+
                 CellularMetrics(
-                    rsrp = signal.ssRsrp.takeIf { it != CellInfo.UNAVAILABLE },
-                    rssnr = signal.ssSinr.takeIf { it != CellInfo.UNAVAILABLE },
-                    rsrq = signal.ssRsrq.takeIf { it != CellInfo.UNAVAILABLE },
-                    cqi = widebandCqi
+                    rsrp = nrSignal.ssRsrp.takeIf { it != CellInfo.UNAVAILABLE } 
+                        ?: nrSignal.csiRsrp.takeIf { it != CellInfo.UNAVAILABLE },
+                    rssnr = nrSignal.ssSinr.takeIf { it != CellInfo.UNAVAILABLE } 
+                        ?: nrSignal.csiSinr.takeIf { it != CellInfo.UNAVAILABLE },
+                    rsrq = nrSignal.ssRsrq.takeIf { it != CellInfo.UNAVAILABLE } 
+                        ?: nrSignal.csiRsrq.takeIf { it != CellInfo.UNAVAILABLE }
                 )
             }
             else -> CellularMetrics()

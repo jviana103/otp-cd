@@ -195,8 +195,7 @@ class RideService() : Service() {
                 subjectiveRating = currentRating,
                 rsrp = cellularMetrics.rsrp,
                 rssnr = cellularMetrics.rssnr,
-                rsrq = cellularMetrics.rsrq,
-                cqi = cellularMetrics.cqi
+                rsrq = cellularMetrics.rsrq
             )
 
             Log.d("RideService", "Uploading reading to Firestore: $reading")

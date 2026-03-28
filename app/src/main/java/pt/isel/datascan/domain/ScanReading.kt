@@ -15,8 +15,7 @@ data class ScanReading(
     val subjectiveRating: Int = 0,
     val rsrp: Int? = null,
     val rssnr: Int? = null,
-    val rsrq: Int? = null,
-    val cqi: Int? = null
+    val rsrq: Int? = null
 ) {
     fun toMap(): Map<String, Any?> = mapOf(
         "timestamp" to timestamp,
@@ -30,7 +29,6 @@ data class ScanReading(
         "subjectiveRating" to subjectiveRating,
         "rsrp" to rsrp,
         "rssnr" to rssnr,
-        "rsrq" to rsrq,
-        "cqi" to cqi
+        "rsrq" to rsrq
     )
 }
