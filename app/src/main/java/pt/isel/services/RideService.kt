@@ -34,6 +34,8 @@ class RideService() : Service() {
 
     private lateinit var notificationHelper: NotificationHelper
     private lateinit var networkService: NetworkService
+
+    private lateinit var cellularService: CellularService
     private val firestoreRepository = FirestoreRepository()
 
     private val serviceJob = Job()
@@ -75,6 +77,7 @@ class RideService() : Service() {
             }
         }
         notificationHelper = NotificationHelper(this)
+        cellularService = CellularService(this)
 
         networkService = NetworkService()
     }
@@ -170,6 +173,7 @@ class RideService() : Service() {
             Log.d("RideService", "Performing data scan and uploading for trip $tripId")
 
             val networkMetrics = networkService.measureNetworkMetrics()
+            val cellularMetrics = cellularService.getCurrentMetrics()
 
             val location = locationService.currentLocation.value
             val bluetoothCount = bluetoothService.deviceCount.value
@@ -189,6 +193,10 @@ class RideService() : Service() {
                 latencyStdDev = networkMetrics.latencyStdDev,
                 packetLoss = networkMetrics.packetLoss,
                 subjectiveRating = currentRating,
+                rsrp = cellularMetrics.rsrp,
+                rssnr = cellularMetrics.rssnr,
+                rsrq = cellularMetrics.rsrq,
+                cqi = cellularMetrics.cqi
             )
 
             Log.d("RideService", "Uploading reading to Firestore: $reading")
