@@ -63,4 +63,41 @@ class FirestoreRepository(
             onFailure = onFailure
         )
     }
+
+    fun deleteTrip(
+        tripId: String,
+        onSuccess: () -> Unit = {},
+        onFailure: (Exception) -> Unit = {}
+    ) {
+        authRepository.ensureAuth(
+            onSuccess = {
+                val tripRef = db.collection(collectionName).document(tripId)
+
+                tripRef.collection("leituras").get()
+                    .addOnSuccessListener { snapshot ->
+                        val batch = db.batch()
+                        for (doc in snapshot.documents) {
+                            batch.delete(doc.reference)
+                        }
+
+                        batch.delete(tripRef)
+
+                        batch.commit()
+                            .addOnSuccessListener {
+                                Log.d("FirestoreRepository", "Trip $tripId and all readings deleted")
+                                onSuccess()
+                            }
+                            .addOnFailureListener { e ->
+                                Log.e("FirestoreRepository", "Error committing batch delete for $tripId", e)
+                                onFailure(e)
+                            }
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e("FirestoreRepository", "Error fetching readings for deletion", e)
+                        onFailure(e)
+                    }
+            },
+            onFailure = onFailure
+        )
+    }
 }
