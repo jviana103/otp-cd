@@ -13,6 +13,8 @@ class SettingsViewModel(private val repository: SettingsRepository) : ViewModel(
     val isTestTrip = repository.isTestTrip
     val notificationInterval = repository.notificationInterval
 
+    val userId = repository.userId
+
     fun updateTimeout(newTimeout: Int) {
         Log.d("SettingsViewModel", "Updating timeout to $newTimeout")
         viewModelScope.launch { repository.updateTimeout(newTimeout) }
