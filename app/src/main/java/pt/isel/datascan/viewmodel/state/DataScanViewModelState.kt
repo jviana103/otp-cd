@@ -5,7 +5,7 @@ import pt.isel.datascan.domain.ScanReading
 
 
 const val DEFAULT_TIMEOUT = 15 * 60
-const val DEFAULT_INTERVAL = 30
+const val DEFAULT_INTERVAL = 32
 const val IS_TEST_TRIP = false
 
 const val NOTIFICATION_REMINDER_INTERVAL = 3 * 60
