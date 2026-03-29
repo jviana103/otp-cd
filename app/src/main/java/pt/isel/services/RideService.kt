@@ -11,7 +11,9 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import pt.isel.OTPCDApplication
 import pt.isel.datascan.domain.ScanReading
 import pt.isel.datascan.domain.TripData
 import pt.isel.datascan.viewmodel.state.DEFAULT_INTERVAL
@@ -21,6 +23,7 @@ import pt.isel.datascan.viewmodel.state.IS_TEST_TRIP
 import pt.isel.datascan.viewmodel.state.NOTIFICATION_REMINDER_INTERVAL
 import pt.isel.helpers.NotificationHelper
 import pt.isel.repository.FirestoreRepository
+import pt.isel.settings.domain.repository.SettingsRepository
 import java.util.Date
 import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
@@ -36,6 +39,9 @@ class RideService() : Service() {
     private lateinit var networkService: NetworkService
 
     private lateinit var cellularService: CellularService
+
+    private lateinit var settingsRepository: SettingsRepository
+
     private val firestoreRepository = FirestoreRepository()
 
     private val serviceJob = Job()
@@ -82,6 +88,8 @@ class RideService() : Service() {
         cellularService = CellularService(this)
 
         networkService = NetworkService()
+
+        settingsRepository = (application as OTPCDApplication).settingsRepository
     }
 
     private var currentRating = DEFAULT_SUBJ_RATING
@@ -204,6 +212,7 @@ class RideService() : Service() {
             val networkMetrics = networkMetricsDeferred.await()
 
             val reading = ScanReading(
+                userId = settingsRepository.userId.first()!!,
                 signalIntensitiesBT = signalIntensitiesBT,
                 wifiCount = wifiCount,
                 bluetoothCount = bluetoothCount,

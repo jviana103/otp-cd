@@ -11,6 +11,8 @@ interface SettingsRepository {
 
     val notificationInterval: Flow<Int>
 
+    val userId: Flow<String?>
+
     suspend fun updateTimeout(newTimeout: Int)
 
     suspend fun updateInterval(newInterval: Int)
@@ -18,4 +20,6 @@ interface SettingsRepository {
     suspend fun updateIsTestTrip(newIsTestTrip: Boolean)
 
     suspend fun updateNotificationInterval(newNotificationInterval: Int)
+
+    suspend fun createUserId()
 }

@@ -34,20 +34,25 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import pt.isel.datascan.screen.DataScanScreen
 import pt.isel.settings.screen.SettingsScreen
 import pt.isel.datascan.viewmodel.DataScanViewModel
-import pt.isel.repository.SettingsPreferenceRepository
 import pt.isel.settings.viewmodel.SettingsViewModel
 import pt.isel.ui.theme.FirstAppTheme
 
-private val Context.dataStore by preferencesDataStore(name = "settings")
+val Context.dataStore by preferencesDataStore(name = "settings")
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val settingsRepository = SettingsPreferenceRepository(dataStore)
+        val settingsRepository = (application as OTPCDApplication).settingsRepository
+
+        lifecycleScope.launch {
+            settingsRepository.createUserId()
+        }
 
         val dataScanViewModel: DataScanViewModel by viewModels {
             object : ViewModelProvider.Factory {

@@ -11,9 +11,11 @@ class MockSettingsRepository: SettingsRepository {
     override val interval = flowOf(DEFAULT_INTERVAL)
     override val isTestTrip = flowOf(IS_TEST_TRIP)
     override val notificationInterval = flowOf(NOTIFICATION_REMINDER_INTERVAL)
+    override val userId = flowOf("test_user")
 
     override suspend fun updateTimeout(newTimeout: Int) {}
     override suspend fun updateInterval(newInterval: Int) {}
     override suspend fun updateIsTestTrip(newIsTestTrip: Boolean) {}
     override suspend fun updateNotificationInterval(newNotificationInterval: Int) {}
+    override suspend fun createUserId() {}
 }
