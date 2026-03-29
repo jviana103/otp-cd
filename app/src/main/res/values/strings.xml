@@ -54,6 +54,7 @@
     <string name="section_trip">Viagem</string>
     <string name="section_development">Desenvolvimento</string>
     <string name="section_about">Sobre</string>"
+    <string name="section_info">Informações</string>"
 
     <string name="label_travel_time">Tempo de viagem</string>
     <string name="label_scan_interval">Intervalo entre leituras</string>
@@ -65,6 +66,7 @@
 \nOs dados são usados exclusivamente para fins académicos no âmbito de desenvolver um modelo de previsão de ocupação de transportes públicos.
 \n\nPara mais informações sobre a applicação: https://github.com/jviana103/otp-cd
     </string>
+    <string name="info_text">ID de utilizador: %1$s</string>
 
     <string name="unit_minutes">%1$d min</string>
     <string name="unit_seconds">%1$d seg</string>

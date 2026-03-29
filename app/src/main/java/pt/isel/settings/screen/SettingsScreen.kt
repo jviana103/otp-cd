@@ -131,7 +131,7 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
         SettingsSection(title = stringResource(R.string.section_about)) {
             Text(
                 text = hyperlinkedString,
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
@@ -144,6 +144,14 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
                 onCheckedChange = {
                     viewModel.updateIsTestTrip(it)
                 }
+            )
+        }
+
+        SettingsSection(title = stringResource(R.string.section_info)) {
+            Text(
+                text = stringResource(R.string.info_text, viewModel.userId.collectAsState("").value!!),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
     }
