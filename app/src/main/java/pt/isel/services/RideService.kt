@@ -150,9 +150,11 @@ class RideService() : Service() {
                 )
 
                 firestoreRepository.createTrip(tripId = tripId, trip = trip, onSuccess = {
-                    locationService.startLocationUpdates()
-                    bluetoothService.startScan()
-                    wifiService.startScan()
+                    if(!isPaused.value) {
+                        locationService.startLocationUpdates()
+                        bluetoothService.startScan()
+                        wifiService.startScan()
+                    }
                 })
 
                 startRideTicker(tripId)
