@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import pt.isel.R
 import pt.isel.datascan.domain.ScanReading
 import pt.isel.datascan.domain.TransportationType
 import pt.isel.datascan.viewmodel.state.DataScanUiState
@@ -123,7 +124,7 @@ class DataScanViewModel(private val repository: SettingsRepository) : ViewModel(
         val isBluetoothOn = bluetoothManager.adapter?.isEnabled == true
 
         if (!isBluetoothOn) {
-            android.widget.Toast.makeText(context, "Ligue o Bluetooth para iniciar o scan!", android.widget.Toast.LENGTH_SHORT).show()
+            android.widget.Toast.makeText(context, context.getString(R.string.bluetooth_reminder), android.widget.Toast.LENGTH_SHORT).show()
             return false
         }
         return true

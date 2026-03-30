@@ -68,6 +68,8 @@
     </string>
     <string name="info_text">ID de utilizador: %1$s</string>
 
+    <string name="bluetooth_reminder">Ligue o Bluetooth para iniciar o scan!</string>
+
     <string name="unit_minutes">%1$d min</string>
     <string name="unit_seconds">%1$d seg</string>
 </resources>
