@@ -100,4 +100,26 @@ class FirestoreRepository(
             onFailure = onFailure
         )
     }
+
+    fun invalidateTrip(
+        tripId: String,
+        onSuccess: () -> Unit = {},
+        onFailure: (Exception) -> Unit = {}
+    ) {
+        authRepository.ensureAuth(
+            onSuccess = {
+                db.collection(collectionName).document(tripId)
+                    .update("isTripValid", false)
+                    .addOnSuccessListener {
+                        Log.d("FirestoreRepository", "Trip $tripId marked as invalid")
+                        onSuccess()
+                    }
+                    .addOnFailureListener { e ->
+                        Log.e("FirestoreRepository", "Error invalidating trip $tripId", e)
+                        onFailure(e)
+                    }
+            },
+            onFailure = onFailure
+        )
+    }
 }

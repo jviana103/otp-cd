@@ -70,7 +70,6 @@ class WifiService(private val context: Context) {
     }
 
     fun startScan() {
-
         if (!isReceiverRegistered) {
             val intentFilter = IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)
             context.registerReceiver(wifiScanReceiver, intentFilter)

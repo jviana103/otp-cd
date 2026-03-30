@@ -111,6 +111,21 @@ class RideService() : Service() {
                 }
                 return START_NOT_STICKY
             }
+            "INVALIDATE_TRIP" -> {
+                val tripIdToInvalidate = intent.getStringExtra("TRIP_ID")
+                isTestTrip = intent.getBooleanExtra("IS_TEST", IS_TEST_TRIP)
+                firestoreRepository.isTest = isTestTrip
+
+                if (tripIdToInvalidate != null) {
+                    firestoreRepository.invalidateTrip(tripIdToInvalidate,
+                        onSuccess = { stopSelf() },
+                        onFailure = { stopSelf() }
+                    )
+                } else {
+                    stopSelf()
+                }
+                return START_NOT_STICKY
+            }
             "UPDATE_RATING" -> {
                 currentRating = intent.getIntExtra("NEW_RATING", DEFAULT_SUBJ_RATING)
             }

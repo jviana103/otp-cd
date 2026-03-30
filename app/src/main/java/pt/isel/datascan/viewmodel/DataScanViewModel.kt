@@ -157,7 +157,7 @@ class DataScanViewModel(private val repository: SettingsRepository) : ViewModel(
             viewModelScope.launch {
                 val isTest = repository.isTestTrip.first()
                 val intent = Intent(appContext, RideService::class.java).apply {
-                    action = "DELETE_TRIP"
+                    action = "INVALIDATE_TRIP"
                     putExtra("TRIP_ID", tripId)
                     putExtra("IS_TEST", isTest)
                 }
