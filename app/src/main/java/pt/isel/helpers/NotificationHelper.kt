@@ -81,4 +81,20 @@ class NotificationHelper(private val context: Context) {
     fun updateTimerNotification(seconds: Int) {
         notificationManager.notify(1, createTimerNotification(seconds))
     }
+
+    fun sendTripFinishedNotification() {
+        val notification = buildBaseNotification(
+            title = context.getString(R.string.notif_trip_finished_title),
+            text = context.getString(R.string.notif_trip_finished_content),
+            channelId = "trip_finished_channel",
+            importance = NotificationManager.IMPORTANCE_HIGH,
+            isOngoing = false,
+            autoCancel = true
+        )
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setVibrate(longArrayOf(0, 500, 200, 500))
+            .build()
+
+        notificationManager.notify(3, notification)
+    }
 }

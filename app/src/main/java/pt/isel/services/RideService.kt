@@ -189,6 +189,7 @@ class RideService() : Service() {
                 delay(1.seconds)
                 seconds--
             }
+            notificationHelper.sendTripFinishedNotification()
 
             stopSelf()
         }

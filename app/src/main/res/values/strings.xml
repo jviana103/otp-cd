@@ -50,6 +50,9 @@
     <string name="notif_reminder_title">Atualizar lotação?</string>
     <string name="notif_reminder_content">A ocupação mudou? Toque para atualizar.</string>
 
+    <string name="notif_trip_finished_title">Viagem Terminada</string>
+    <string name="notif_trip_finished_content">Por favor, confirme se a recolha de dados foi válida.</string>
+
     <string name="settings_title">Configurações</string>
     <string name="section_trip">Viagem</string>
     <string name="section_development">Desenvolvimento</string>
