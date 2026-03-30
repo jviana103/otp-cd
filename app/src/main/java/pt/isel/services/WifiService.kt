@@ -25,6 +25,7 @@ class WifiService(private val context: Context) {
 
     private val discoveredWifi = MutableStateFlow<Map<String, Int>>(emptyMap())
 
+    private var isReceiverRegistered = false
     private val serviceScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
     val strongestSignals: StateFlow<List<Int>> = discoveredWifi
         .map { map ->
@@ -69,9 +70,12 @@ class WifiService(private val context: Context) {
     }
 
     fun startScan() {
-        val intentFilter = IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)
-        context.registerReceiver(wifiScanReceiver, intentFilter)
 
+        if (!isReceiverRegistered) {
+            val intentFilter = IntentFilter(WifiManager.SCAN_RESULTS_AVAILABLE_ACTION)
+            context.registerReceiver(wifiScanReceiver, intentFilter)
+            isReceiverRegistered = true
+        }
         val success = wifiManager.startScan()
         Log.d("WifiService", "Scan Started: $success")
         if (!success) {
@@ -80,7 +84,14 @@ class WifiService(private val context: Context) {
     }
 
     fun stopScan() {
-        context.unregisterReceiver(wifiScanReceiver)
+        if (isReceiverRegistered) {
+            try {
+                context.unregisterReceiver(wifiScanReceiver)
+            } catch (e: IllegalArgumentException) {
+                Log.e("WifiService", "Receiver wasn't registered", e)
+            }
+            isReceiverRegistered = false
+        }
         _wifiCount.value = 0
     }
 
