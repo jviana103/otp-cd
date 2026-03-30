@@ -207,6 +207,7 @@ class RideService() : Service() {
 
             bluetoothService.clearScan()
             bluetoothService.startScan()
+            wifiService.clearScan()
             wifiService.requestNewScan()
 
             val networkMetricsDeferred = async { networkService.measureNetworkMetrics() }
