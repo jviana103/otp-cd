@@ -7,9 +7,15 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.net.wifi.WifiManager
 import android.util.Log
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 
 class WifiService(private val context: Context) {
     private val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
@@ -17,7 +23,18 @@ class WifiService(private val context: Context) {
     private val _wifiCount = MutableStateFlow(0)
     val wifiCount: StateFlow<Int> = _wifiCount.asStateFlow()
 
-    private var lastValidWifiCount = 0
+    private val discoveredWifi = MutableStateFlow<Map<String, Int>>(emptyMap())
+
+    private val serviceScope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+    val strongestSignals: StateFlow<List<Int>> = discoveredWifi
+        .map { map ->
+            map.values.sortedDescending().take(5)
+        }
+        .stateIn(
+            scope = serviceScope,
+            started = SharingStarted.Eagerly,
+            initialValue = emptyList()
+        )
 
     private val wifiScanReceiver = object : BroadcastReceiver() {
         override fun onReceive(context: Context, intent: Intent) {
@@ -34,12 +51,19 @@ class WifiService(private val context: Context) {
         val results = wifiManager.scanResults
         if (results.isEmpty()) return
 
-        val uniqueCount = results.map { it.BSSID }.distinct().size
+        val allWifiS = discoveredWifi.value.toMutableMap()
 
-        if (uniqueCount > 0) {
-            lastValidWifiCount = uniqueCount
-            _wifiCount.value = uniqueCount
+        results.forEach { scanResult ->
+            val bssid = scanResult.BSSID
+            val rssi = scanResult.level
+
+            allWifiS[bssid] = rssi
         }
+
+        discoveredWifi.value = allWifiS
+
+        val uniqueCount = allWifiS.size
+        _wifiCount.value = uniqueCount
 
         Log.d("WifiService", "Scan Complete: Found $uniqueCount unique APs")
     }

@@ -201,6 +201,7 @@ class RideService() : Service() {
             val location = locationService.currentLocation.value
             val bluetoothCount = bluetoothService.deviceCount.value
             val signalIntensitiesBT = bluetoothService.strongestSignals.value
+            val signalIntensitiesWF = wifiService.strongestSignals.value
             val wifiCount = wifiService.wifiCount.value
             val cellularMetrics = cellularService.getCurrentMetrics()
 
@@ -214,6 +215,7 @@ class RideService() : Service() {
             val reading = ScanReading(
                 userId = settingsRepository.userId.first()!!,
                 signalIntensitiesBT = signalIntensitiesBT,
+                signalIntensitiesWF = signalIntensitiesWF,
                 wifiCount = wifiCount,
                 bluetoothCount = bluetoothCount,
                 latitude = location?.latitude,
