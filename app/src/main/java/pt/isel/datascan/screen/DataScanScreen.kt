@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.AlertDialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
@@ -121,13 +120,20 @@ fun DataScanScreen(
                     color = if (state.isPaused) MaterialTheme.colorScheme.secondary else MaterialTheme.colorScheme.primary
                 )
 
-                if (!state.isPaused) {
-                    Text(
-                        text = stringResource(R.string.label_collecting_evidence),
-                        style = MaterialTheme.typography.bodyMedium
-                    )
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(24.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (!state.isPaused) {
+                        Text(
+                            text = stringResource(R.string.label_collecting_evidence),
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+                    }
                 }
-
+/*
                 Text(stringResource(R.string.label_current_occupancy, state.currentSubjectiveRating))
 
                 Text(stringResource(R.string.label_bluetooth_devices, state.lastRead?.bluetoothCount ?: 0))
@@ -135,7 +141,7 @@ fun DataScanScreen(
                 Text(stringResource(R.string.label_wifi_devices, state.lastRead?.wifiCount ?: 0))
 
                 Text(stringResource(R.string.label_current_location, state.lastRead?.latitude ?: 0.0, state.lastRead?.longitude ?: 0.0))
-
+*/
                 Row(
                     modifier = Modifier.fillMaxWidth(0.8f),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -181,24 +187,16 @@ fun DataScanScreen(
         }
 
         if (state.finishedTripIdToConfirm != null) {
-            AlertDialog(
-                onDismissRequest = {  },
+            ConfirmationDialog(
+                title = stringResource(R.string.dialog_stayed_inside_title),
+                message = stringResource(R.string.dialog_stayed_inside_message),
+                confirmText = stringResource(R.string.btn_yes),
+                dismissText = stringResource(R.string.btn_no),
+                confirmButtonColor = MaterialTheme.colorScheme.primary,
+                isDismissDestructive = true,
                 properties = DialogProperties(dismissOnBackPress = false, dismissOnClickOutside = false),
-                title = { Text(text = stringResource(R.string.dialog_stayed_inside_title)) },
-                text = { Text(text = stringResource(R.string.dialog_stayed_inside_message)) },
-                confirmButton = {
-                    Button(onClick = { viewModel.handleTripConfirmation(context, stayedInside = true) }) {
-                        Text(stringResource(R.string.btn_yes))
-                    }
-                },
-                dismissButton = {
-                    Button(
-                        onClick = { viewModel.handleTripConfirmation(context, stayedInside = false) },
-                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.error)
-                    ) {
-                        Text(stringResource(R.string.btn_no))
-                    }
-                }
+                onConfirm = { viewModel.handleTripConfirmation(context, stayedInside = true) },
+                onDismiss = { viewModel.handleTripConfirmation(context, stayedInside = false) }
             )
         }
 
@@ -207,7 +205,7 @@ fun DataScanScreen(
                 title = stringResource(R.string.dialog_finish_trip_title),
                 message = stringResource(R.string.dialog_finish_trip_message),
                 confirmText = stringResource(R.string.btn_confirm_stop),
-                isDestructive = true,
+                isConfirmDestructive = true,
                 onConfirm = {
                     showStopConfirmation = false
                     onStopService()
