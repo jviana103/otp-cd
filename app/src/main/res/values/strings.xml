@@ -75,4 +75,7 @@
 
     <string name="unit_minutes">%1$d min</string>
     <string name="unit_seconds">%1$d seg</string>
+
+    <string name="language_selection">Idioma</string>
+    <string name="english">Inglês</string>
 </resources>

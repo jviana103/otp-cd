@@ -1,5 +1,7 @@
 package pt.isel.settings.screen
 
+import android.util.Log
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
@@ -153,6 +155,27 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
+        }
+
+        SettingsSection(title = stringResource(R.string.language_selection)) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(text = stringResource(R.string.english))
+                val currentLocale = AppCompatDelegate.getApplicationLocales().toLanguageTags()
+                Log.d("LAN", "$currentLocale" )
+                val isEnglish = currentLocale.startsWith("en")
+
+                Switch(
+                    checked = isEnglish,
+                    onCheckedChange = { setEnglish ->
+                        val lang = if (setEnglish) "en" else "pt"
+                        viewModel.changeLanguage(lang)
+                    }
+                )
+            }
         }
     }
 }

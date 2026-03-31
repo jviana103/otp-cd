@@ -40,6 +40,11 @@
             android:name=".services.RideService"
             android:foregroundServiceType="dataSync"
             android:exported="false"/>
+
+        <meta-data
+            android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"
+            android:value="androidx.appcompat.app.AppLocalesMetadataHolderService" />
+
     </application>
 
 

@@ -1,6 +1,8 @@
 package pt.isel.settings.viewmodel
 
 import android.util.Log
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.launch
@@ -30,5 +32,10 @@ class SettingsViewModel(private val repository: SettingsRepository) : ViewModel(
 
     fun updateNotificationInterval(newInterval: Int) {
         viewModelScope.launch { repository.updateNotificationInterval(newInterval) }
+    }
+
+    fun changeLanguage(languageCode: String) {
+        val appLocale: LocaleListCompat = LocaleListCompat.forLanguageTags(languageCode)
+        AppCompatDelegate.setApplicationLocales(appLocale)
     }
 }
