@@ -50,6 +50,9 @@
     <string name="notif_reminder_title">Update Occupancy?</string>
     <string name="notif_reminder_content">Has the occupancy changed? Tap to update.</string>
 
+    <string name="notif_trip_finished_title">Trip Finished</string>
+    <string name="notif_trip_finished_content">Please confirm if the data collection was valid.</string>
+
     <string name="settings_title">Settings</string>
     <string name="section_trip">Trip</string>
     <string name="section_development">Development</string>
@@ -68,9 +71,14 @@
     </string>
     <string name="info_text">User ID: %1$s</string>
 
+    <string name="bluetooth_reminder">Turn on Bluetooth to start scanning!</string>
+
     <string name="unit_minutes">%1$d min</string>
     <string name="unit_seconds">%1$d sec</string>
 
     <string name="language_selection">Language</string>
+    <string name="select_language">Select Language</string>
     <string name="english">English</string>
+    <string name="portuguese">Portuguese</string>
+
 </resources>
