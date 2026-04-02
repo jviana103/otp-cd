@@ -54,10 +54,11 @@ dependencies {
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.firestore)
-    implementation("com.google.firebase:firebase-auth")
     implementation(libs.firebase.analytics)
     implementation(libs.androidx.datastore)
     implementation(libs.androidx.appcompat)
+    implementation("com.google.firebase:firebase-auth")
+    implementation("androidx.compose.material:material-icons-extended")
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)

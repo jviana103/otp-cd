@@ -7,14 +7,19 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -31,7 +36,8 @@ fun RatingDialog(
     onConfirm: (Int) -> Unit,
     onDismiss: () -> Unit
 ) {
-    var selectedRating by remember { mutableStateOf(initialRating) }
+    var selectedRating by remember { mutableIntStateOf(initialRating) }
+    var showInfo by remember { mutableStateOf(false) }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -40,7 +46,6 @@ fun RatingDialog(
             Column {
                 Text(text = stringResource(id = R.string.dialog_occupancy_question))
                 Spacer(modifier = Modifier.height(16.dp))
-
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceEvenly
@@ -53,13 +58,26 @@ fun RatingDialog(
                         )
                     }
                 }
-
                 Row(
                     modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(stringResource(id = R.string.label_occupancy_empty), style = MaterialTheme.typography.bodySmall)
                     Text(stringResource(id = R.string.label_occupancy_full), style = MaterialTheme.typography.bodySmall)
+                }
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 0.dp),
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    IconButton(onClick = { showInfo = true }) {
+                        Icon(
+                            imageVector = Icons.Default.Info,
+                            contentDescription = "Info",
+                            tint = MaterialTheme.colorScheme.primary
+                        )
+                    }
                 }
             }
         },
@@ -74,6 +92,27 @@ fun RatingDialog(
             }
         }
     )
+    if (showInfo) {
+        AlertDialog(
+            onDismissRequest = { showInfo = false },
+            title = { Text(stringResource(R.string.dialog_info_title)) },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text(stringResource(R.string.rating_desc_1), style = MaterialTheme.typography.bodyMedium)
+                    Text(stringResource(R.string.rating_desc_2), style = MaterialTheme.typography.bodyMedium)
+                    Text(stringResource(R.string.rating_desc_3), style = MaterialTheme.typography.bodyMedium)
+                    Text(stringResource(R.string.rating_desc_4), style = MaterialTheme.typography.bodyMedium)
+                    Text(stringResource(R.string.rating_desc_5), style = MaterialTheme.typography.bodyMedium)
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showInfo = false }) {
+                    Text(stringResource(R.string.button_confirm))
+                }
+            }
+        )
+    }
+
 }
 
 @Preview

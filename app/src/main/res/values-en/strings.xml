@@ -81,4 +81,11 @@
     <string name="english">English</string>
     <string name="portuguese">Portuguese</string>
 
+    <string name="rating_desc_1">1 - Many seats available</string>
+    <string name="rating_desc_2">2 - Some seats available</string>
+    <string name="rating_desc_3">3 - Almost no seats available, some people standing</string>
+    <string name="rating_desc_4">4 - Many passengers standing, but able to move around</string>
+    <string name="rating_desc_5">5 - Completely full, difficult to move around</string>
+    <string name="dialog_info_title">Occupancy Guide</string>
+
 </resources>
