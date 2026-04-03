@@ -70,82 +70,6 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
             color = MaterialTheme.colorScheme.primary
         )
 
-        SettingsSection(title = stringResource(R.string.section_trip)) {
-            SettingsSlider(
-                label = stringResource(R.string.label_travel_time),
-                value = travelTime.toFloat() / 60,
-                valueRange = 1f..60f,
-                steps = 59,
-                onValueChange = {
-                    viewModel.updateTimeout((it.roundToInt() * 60))
-                },
-                valueDisplay = stringResource(R.string.unit_minutes, travelTime / 60)
-            )
-
-            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
-
-            SettingsSlider(
-                label = stringResource(R.string.label_notification_interval),
-                value = notificationTime.toFloat(),
-                valueRange = 30f..300f,
-                steps = 26,
-                onValueChange = {
-                    viewModel.updateNotificationInterval(it.roundToInt())
-                },
-                valueDisplay = stringResource(R.string.unit_seconds, notificationTime)
-            )
-        }
-
-        val hyperlinkedString = buildAnnotatedString {
-            val fullText = stringResource(R.string.about_text)
-            val linkText = "https://github.com/jviana103/otp-cd"
-            val startIndex = fullText.indexOf(linkText)
-            val endIndex = startIndex + linkText.length
-
-            append(fullText)
-
-            addLink(
-                LinkAnnotation.Url(
-                    url = "https://github.com/jviana103/otp-cd",
-                    styles = TextLinkStyles(
-                        style = SpanStyle(
-                            color = Color.Blue,
-                            textDecoration = TextDecoration.Underline
-                        )
-                    )
-                ),
-                start = startIndex,
-                end = endIndex
-            )
-        }
-
-        SettingsSection(title = stringResource(R.string.section_about)) {
-            Text(
-                text = hyperlinkedString,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-
-        SettingsSection(title = stringResource(R.string.section_development)) {
-            SettingsToggle(
-                label = stringResource(R.string.label_test_trip),
-                description = stringResource(R.string.desc_test_trip),
-                checked = isTestTrip,
-                onCheckedChange = {
-                    viewModel.updateIsTestTrip(it)
-                }
-            )
-        }
-
-        SettingsSection(title = stringResource(R.string.section_info)) {
-            Text(
-                text = stringResource(R.string.info_text, viewModel.userId.collectAsState("").value!!),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-
         val context = LocalContext.current
 
         val appLocales = AppCompatDelegate.getApplicationLocales().toLanguageTags()
@@ -198,6 +122,83 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
                 }
             }
         }
+
+        SettingsSection(title = stringResource(R.string.section_trip)) {
+            SettingsSlider(
+                label = stringResource(R.string.label_travel_time),
+                value = travelTime.toFloat() / 60,
+                valueRange = 1f..60f,
+                steps = 59,
+                onValueChange = {
+                    viewModel.updateTimeout((it.roundToInt() * 60))
+                },
+                valueDisplay = stringResource(R.string.unit_minutes, travelTime / 60)
+            )
+
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+            SettingsSlider(
+                label = stringResource(R.string.label_notification_interval),
+                value = notificationTime.toFloat(),
+                valueRange = 30f..300f,
+                steps = 26,
+                onValueChange = {
+                    viewModel.updateNotificationInterval(it.roundToInt())
+                },
+                valueDisplay = stringResource(R.string.unit_seconds, notificationTime)
+            )
+        }
+
+        val hyperlinkedString = buildAnnotatedString {
+            val fullText = stringResource(R.string.about_text)
+            val linkText = "https://github.com/jviana103/otp-cd"
+            val startIndex = fullText.indexOf(linkText)
+            val endIndex = startIndex + linkText.length
+
+            append(fullText)
+
+            addLink(
+                LinkAnnotation.Url(
+                    url = "https://github.com/jviana103/otp-cd",
+                    styles = TextLinkStyles(
+                        style = SpanStyle(
+                                color = Color(0xFF6BB6FF),
+                            textDecoration = TextDecoration.Underline
+                        )
+                    )
+                ),
+                start = startIndex,
+                end = endIndex
+            )
+        }
+
+        SettingsSection(title = stringResource(R.string.section_about)) {
+            Text(
+                text = hyperlinkedString,
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+
+        SettingsSection(title = stringResource(R.string.section_development)) {
+            SettingsToggle(
+                label = stringResource(R.string.label_test_trip),
+                description = stringResource(R.string.desc_test_trip),
+                checked = isTestTrip,
+                onCheckedChange = {
+                    viewModel.updateIsTestTrip(it)
+                }
+            )
+        }
+
+        SettingsSection(title = stringResource(R.string.section_info)) {
+            Text(
+                text = stringResource(R.string.info_text, viewModel.userId.collectAsState("").value!!),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+
     }
 }
 

@@ -65,7 +65,7 @@
     <string name="label_test_trip">Viagem de teste</string>
     <string name="desc_test_trip">Se ativo, os dados serão guardados na coleção \'viagens_teste\'</string>
     <string name="about_text">
-        Esta app recolhe dados técnicos anónimos, incluindo o número de dispositivos Bluetooth e redes Wi-Fi nas proximidades, a localização GPS e o nível de ocupação reportado.
+        Esta aplicação recolhe dados técnicos anónimos, incluindo o número de dispositivos Bluetooth e redes Wi-Fi nas proximidades, a localização GPS, dados de redes móveis e o nível de ocupação reportado.
         \nOs dados são usados exclusivamente para fins académicos no âmbito de desenvolver um modelo de previsão de ocupação de transportes públicos.
         \n\nPara mais informações sobre a applicação: https://github.com/jviana103/otp-cd
     </string>
@@ -81,11 +81,11 @@
     <string name="english">Inglês</string>
     <string name="portuguese">Português</string>
 
-    <string name="rating_desc_1">1 - Muitos lugares sentados disponíveis</string>
-    <string name="rating_desc_2">2 - Alguns lugares sentados disponíveis</string>
-    <string name="rating_desc_3">3 - Poucos lugares sentados disponíveis, alguns passageiros de pé</string>
-    <string name="rating_desc_4">4 - Alguns passageiros de pé, possível circular</string>
-    <string name="rating_desc_5">5 - Completamente cheio, difícil circular</string>
+    <string name="rating_desc_1">Muitos lugares sentados disponíveis</string>
+    <string name="rating_desc_2">Alguns lugares sentados disponíveis</string>
+    <string name="rating_desc_3">Poucos lugares sentados disponíveis, alguns passageiros de pé</string>
+    <string name="rating_desc_4">Alguns passageiros de pé, possível circular</string>
+    <string name="rating_desc_5">Completamente cheio, difícil circular</string>
     <string name="dialog_info_title">Guia de Ocupação</string>
 
 </resources>

@@ -1,6 +1,7 @@
 package pt.isel.ui.components
 
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -23,8 +24,10 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import pt.isel.R
@@ -65,17 +68,30 @@ fun RatingDialog(
                     Text(stringResource(id = R.string.label_occupancy_empty), style = MaterialTheme.typography.bodySmall)
                     Text(stringResource(id = R.string.label_occupancy_full), style = MaterialTheme.typography.bodySmall)
                 }
+
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 0.dp),
-                    horizontalArrangement = Arrangement.Start
+                        .padding(top = 4.dp),
                 ) {
-                    IconButton(onClick = { showInfo = true }) {
-                        Icon(
-                            imageVector = Icons.Default.Info,
-                            contentDescription = "Info",
-                            tint = MaterialTheme.colorScheme.primary
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(48.dp),
+                    ) {
+                        Text(
+                            text ="$selectedRating: " +
+                                when(selectedRating) {
+                                    1 -> stringResource(id = R.string.rating_desc_1)
+                                    2 -> stringResource(id = R.string.rating_desc_2)
+                                    3 -> stringResource(id = R.string.rating_desc_3)
+                                    4 -> stringResource(id = R.string.rating_desc_4)
+                                    5 -> stringResource(id = R.string.rating_desc_5)
+                                    else -> ""
+                                },
+                            style = MaterialTheme.typography.bodyMedium,
+
+
                         )
                     }
                 }
