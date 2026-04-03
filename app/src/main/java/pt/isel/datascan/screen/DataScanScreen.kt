@@ -178,6 +178,7 @@ fun DataScanScreen(
         if (showUpdateDialog) {
             RatingDialog(
                 initialRating = state.currentSubjectiveRating,
+                confirmText = stringResource(R.string.btn_confirm),
                 onConfirm = { newRating ->
                     viewModel.updateOngoingRating(context, newRating)
                     showUpdateDialog = false

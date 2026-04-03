@@ -36,6 +36,7 @@ import pt.isel.datascan.viewmodel.state.DEFAULT_SUBJ_RATING
 @Composable
 fun RatingDialog(
     initialRating: Int = DEFAULT_SUBJ_RATING,
+    confirmText: String = stringResource(R.string.button_start_trip),
     onConfirm: (Int) -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -99,7 +100,7 @@ fun RatingDialog(
         },
         confirmButton = {
             Button(onClick = { onConfirm(selectedRating) }) {
-                Text(stringResource(id = R.string.button_start_trip))
+                Text(confirmText)
             }
         },
         dismissButton = {
