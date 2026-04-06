@@ -77,8 +77,7 @@ fun RatingDialog(
                 ) {
                     Box(
                         modifier = Modifier
-                            .fillMaxWidth()
-                            .height(48.dp),
+                            .fillMaxWidth(),
                     ) {
                         Text(
                             text ="$selectedRating: " +
