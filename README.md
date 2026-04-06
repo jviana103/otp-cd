@@ -21,20 +21,20 @@
 
 > **1. Configurações:** Ajuste as suas preferências no menu de definições.
 > 
-> ![Menu de Configurações](readme_resources/Screenshot_2026-04-06-13-13-57-565_pt.isel.jpg)
+> <img src="readme_resources/Screenshot_2026-04-06-13-13-57-565_pt.isel.jpg" alt="Menu de Configurações" width="250">
 >
-> **2. Seleção de Transporte:** No ecrã principal, selecione o meio de transporte. Apenas é possível escolher entre Metro e Comboio.
+> **2. Seleção de Transporte:** No ecrã principal, selecione o meio de transporte. Atualmente, apenas é possível escolher entre Metro e Comboio.
 >
-> ![Seleção de Transporte](readme_resources/Screenshot_2026-04-06-13-32-31-019_pt.isel.jpg)
+> <img src="readme_resources/Screenshot_2026-04-06-13-32-31-019_pt.isel.jpg" alt="Seleção de Transporte" width="250">
 >
-> **3. Iniciar Recolha:** Clique em iniciar recolha e classifique a lotação atual (de 1 a 5) de acordo com a descrição.
+> **3. Iniciar Recolha:** Clique em iniciar recolha e classifique a lotação atual (de 1 a 5).
 >
-> ![Lotação Inicial](readme_resources/Screenshot_2026-04-06-13-13-40-334_pt.isel.jpg)
+> <img src="readme_resources/Screenshot_2026-04-06-13-13-40-334_pt.isel.jpg" alt="Lotação Inicial" width="250">
 >
 > **4. Durante a Viagem:** Enquanto o tempo decorre, é possível pausar a recolha ou alterar a lotação diretamente no ecrã principal.
 >
-> ![Ecrã de Viagem](readme_resources/Screenshot_2026-04-06-13-33-57-207_pt.isel.jpg)
+> <img src="readme_resources/Screenshot_2026-04-06-13-33-57-207_pt.isel.jpg" alt="Ecrã de Viagem" width="250">
 >
-> **5. Finalizar:** Ao terminar a viagem, será exibida a confirmação de segurança dos dados. É muito importante selecionar "Não" caso alguma leitura tenha sido feita fora do meio de transporte escolhido.
+> **5. Finalizar:** Ao terminar a viagem, será exibida a confirmação de segurança dos dados. É muito importante selecionar "Não" caso alguma leitura tenha sido feita fora do transporte/carruagem.
 >
-> ![Confirmação de Segurança](readme_resources/Screenshot_2026-04-06-13-36-48-951_pt.isel.jpg)
+> <img src="readme_resources/Screenshot_2026-04-06-13-36-48-951_pt.isel.jpg" alt="Confirmação de Segurança" width="250">
