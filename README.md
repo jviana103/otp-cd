@@ -12,7 +12,8 @@
 > 
 > Apenas inicie a coleta de dados quando estiver dentro do transporte selecionado. Não se esqueça de terminar a viagem quando sair do transporte.
 >
-> A aplicação requer que a localização do dispostivo esteja ligada.
+> **Importante:** A aplicação requer que a localização do dispostivo esteja ligada em todos os momentos, não somente no uso do app.
+> 
 > Versão mínima do Android suportada: 9
 
 ## Instalação
