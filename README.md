@@ -17,7 +17,7 @@
 
 ## Instalação
 
-> Faça o download do APK em https://github.com/jviana103/otp-cd/releases/download/public-release-1.0.1/otp-cd.apk e instale-o no seu dispositivo Android. Certifique-se de conceder as permissões necessárias para que a aplicação funcione corretamente.
+> Faça o download do APK em https://github.com/jviana103/otp-cd/releases/download/public-release-1.0.3/otp-cd.apk e instale-o no seu dispositivo Android. Certifique-se de conceder as permissões necessárias para que a aplicação funcione corretamente.
 
 ## Utilização
 
