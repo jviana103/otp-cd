@@ -11,7 +11,6 @@ import pt.isel.datascan.viewmodel.state.DEFAULT_TIMEOUT
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.stringPreferencesKey
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.onStart
 import pt.isel.datascan.viewmodel.state.DEFAULT_INTERVAL
 import pt.isel.datascan.viewmodel.state.IS_TEST_TRIP
 import pt.isel.datascan.viewmodel.state.NOTIFICATION_REMINDER_INTERVAL
@@ -74,8 +73,12 @@ class SettingsPreferenceRepository (
         val userIdNullable = userId.first()
         if (userIdNullable != null) return
 
+        val release = android.os.Build.VERSION.RELEASE
+        val sdk = android.os.Build.VERSION.SDK_INT
+
         dataStore.edit { preferences ->
-            preferences[userIdKey] = java.util.UUID.randomUUID().toString()
+            val uuid = java.util.UUID.randomUUID().toString()
+            preferences[userIdKey] = "$uuid-v$release-api$sdk"
         }
     }
 }
