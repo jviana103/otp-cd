@@ -72,6 +72,8 @@
     <string name="info_text">User ID: %1$s</string>
 
     <string name="bluetooth_reminder">Turn on Bluetooth to start scanning!</string>
+    <string name="location_reminder">Turn on Location to start scanning!</string>
+    <string name="toast_permissions_required">Not all permissions were granted!</string>
 
     <string name="unit_minutes">%1$d min</string>
     <string name="unit_seconds">%1$d sec</string>

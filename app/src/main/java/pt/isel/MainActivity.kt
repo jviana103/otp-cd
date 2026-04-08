@@ -4,6 +4,7 @@
     import android.content.Context
     import android.os.Build
     import android.os.Bundle
+    import androidx.activity.compose.rememberLauncherForActivityResult
     import androidx.activity.compose.setContent
     import androidx.activity.enableEdgeToEdge
     import androidx.activity.result.contract.ActivityResultContracts
@@ -115,6 +116,10 @@
         var currentDestination by rememberSaveable { mutableStateOf(AppDestinations.HOME) }
         val context = LocalContext.current
 
+        val permissionLauncher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestMultiplePermissions()
+        ) {}
+
         NavigationSuiteScaffold(
             navigationSuiteItems = {
                 AppDestinations.entries.forEach { destination ->
@@ -134,7 +139,13 @@
                             DataScanScreen(
                                 viewModel = dataScanViewModel,
                                 onStartService = { rating ->
-                                    dataScanViewModel.confirmInitialRating(context, rating)
+                                    val missing = dataScanViewModel.checkPermissions(context)
+
+                                    if (missing.isEmpty()) {
+                                        dataScanViewModel.confirmInitialRating(context, rating)
+                                    } else {
+                                        permissionLauncher.launch(missing.toTypedArray())
+                                    }
                                 },
                                 onStopService = {
                                     dataScanViewModel.stopRide(context)
