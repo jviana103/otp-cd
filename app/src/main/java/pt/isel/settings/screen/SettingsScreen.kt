@@ -179,26 +179,6 @@ fun SettingsScreen(viewModel: SettingsViewModel) {
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
-
-        SettingsSection(title = stringResource(R.string.section_development)) {
-            SettingsToggle(
-                label = stringResource(R.string.label_test_trip),
-                description = stringResource(R.string.desc_test_trip),
-                checked = isTestTrip,
-                onCheckedChange = {
-                    viewModel.updateIsTestTrip(it)
-                }
-            )
-        }
-
-        SettingsSection(title = stringResource(R.string.section_info)) {
-            Text(
-                text = stringResource(R.string.info_text, viewModel.userId.collectAsState("").value!!),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-
     }
 }
 
