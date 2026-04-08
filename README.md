@@ -11,11 +11,13 @@
 > **Todos os dados são completamente anónimos**
 > 
 > Apenas inicie a coleta de dados quando estiver dentro do transporte selecionado. Não se esqueça de terminar a viagem quando sair do transporte.
-> 
+>
+> A aplicação requer que a localização do dispostivo esteja ligada.
+> Versão mínima do Android suportada: 9
 
 ## Instalação
 
-> Faça o download do APK em https://github.com/jviana103/otp-cd/releases/download/public-release-1.0.2/otp-cd.apk e instale-o no seu dispositivo Android. Certifique-se de conceder as permissões necessárias para que a aplicação funcione corretamente.
+> Faça o download do APK em https://github.com/jviana103/otp-cd/releases/download/public-release-1.0.1/otp-cd.apk e instale-o no seu dispositivo Android. Certifique-se de conceder as permissões necessárias para que a aplicação funcione corretamente.
 
 ## Utilização
 
