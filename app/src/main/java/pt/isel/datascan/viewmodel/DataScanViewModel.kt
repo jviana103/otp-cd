@@ -154,6 +154,12 @@ class DataScanViewModel(private val repository: SettingsRepository) : ViewModel(
         if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION)
             != PackageManager.PERMISSION_GRANTED) {
             missing.add(Manifest.permission.ACCESS_FINE_LOCATION)
+            missing.add(Manifest.permission.ACCESS_COARSE_LOCATION)
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+                != PackageManager.PERMISSION_GRANTED) {
+                missing.add(Manifest.permission.ACCESS_BACKGROUND_LOCATION)
+            }
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -175,7 +181,7 @@ class DataScanViewModel(private val repository: SettingsRepository) : ViewModel(
         }
 
         if (missing.isNotEmpty()) {
-            Toast.makeText(context, context.getString(R.string.toast_permissions_required), Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, context.getString(R.string.toast_permissions_required), Toast.LENGTH_LONG).show()
         }
 
         return missing
