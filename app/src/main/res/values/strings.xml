@@ -67,7 +67,7 @@
     <string name="about_text">
         Esta aplicação recolhe dados técnicos anónimos, incluindo o número de dispositivos Bluetooth e redes Wi-Fi nas proximidades, a localização GPS, dados de redes móveis e o nível de ocupação reportado.
         \nOs dados são usados exclusivamente para fins académicos no âmbito de desenvolver um modelo de previsão de ocupação de transportes públicos.
-        \n\nPara mais informações sobre a applicação: https://github.com/jviana103/otp-cd
+        \n\nPara mais informações sobre a aplicação: https://github.com/jviana103/otp-cd
     </string>
     <string name="info_text">ID de utilizador: %1$s</string>
 
