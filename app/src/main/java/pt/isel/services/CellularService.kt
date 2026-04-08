@@ -4,11 +4,9 @@ import android.Manifest
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.pm.PackageManager
+import android.os.Build
 import android.telephony.CellInfo
 import android.telephony.CellInfoLte
-import android.telephony.CellInfoNr
-import android.telephony.CellSignalStrengthLte
-import android.telephony.CellSignalStrengthNr
 import android.telephony.TelephonyManager
 import androidx.core.content.ContextCompat
 
@@ -36,13 +34,20 @@ class CellularService(private val context: Context) {
 
         val registeredCell = allCellInfo.firstOrNull { it.isRegistered } ?: return CellularMetrics()
 
-        val currentSignalStrength = telephonyManager.signalStrength
-        val signalStrengths = currentSignalStrength?.cellSignalStrengths ?: emptyList()
+        val signalStrengths = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            telephonyManager.signalStrength?.cellSignalStrengths ?: emptyList()
+        } else {
+            emptyList()
+        }
 
         return when (registeredCell) {
             is CellInfoLte -> {
-                val lteSignal = signalStrengths.filterIsInstance<CellSignalStrengthLte>().firstOrNull() 
-                    ?: registeredCell.cellSignalStrength
+                val lteSignal = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    signalStrengths.filterIsInstance<android.telephony.CellSignalStrengthLte>().firstOrNull()
+                        ?: registeredCell.cellSignalStrength
+                } else {
+                    registeredCell.cellSignalStrength
+                }
 
                 CellularMetrics(
                     rsrp = lteSignal.rsrp.takeIf { it != CellInfo.UNAVAILABLE },
@@ -50,20 +55,31 @@ class CellularService(private val context: Context) {
                     rsrq = lteSignal.rsrq.takeIf { it != CellInfo.UNAVAILABLE }
                 )
             }
-            is CellInfoNr -> {
-                val nrSignal = signalStrengths.filterIsInstance<CellSignalStrengthNr>().firstOrNull()
-                    ?: (registeredCell.cellSignalStrength as CellSignalStrengthNr)
-
-                CellularMetrics(
-                    rsrp = nrSignal.ssRsrp.takeIf { it != CellInfo.UNAVAILABLE } 
-                        ?: nrSignal.csiRsrp.takeIf { it != CellInfo.UNAVAILABLE },
-                    rssnr = nrSignal.ssSinr.takeIf { it != CellInfo.UNAVAILABLE } 
-                        ?: nrSignal.csiSinr.takeIf { it != CellInfo.UNAVAILABLE },
-                    rsrq = nrSignal.ssRsrq.takeIf { it != CellInfo.UNAVAILABLE } 
-                        ?: nrSignal.csiRsrq.takeIf { it != CellInfo.UNAVAILABLE }
-                )
+            else -> {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    getNrMetricsSafe(registeredCell, signalStrengths)
+                } else {
+                    CellularMetrics()
+                }
             }
-            else -> CellularMetrics()
         }
+    }
+
+    @SuppressLint("NewApi")
+    private fun getNrMetricsSafe(registeredCell: CellInfo, signalStrengths: List<android.telephony.CellSignalStrength>): CellularMetrics {
+        if (registeredCell is android.telephony.CellInfoNr) {
+            val nrSignal = signalStrengths.filterIsInstance<android.telephony.CellSignalStrengthNr>().firstOrNull()
+                ?: (registeredCell.cellSignalStrength as android.telephony.CellSignalStrengthNr)
+
+            return CellularMetrics(
+                rsrp = nrSignal.ssRsrp.takeIf { it != CellInfo.UNAVAILABLE }
+                    ?: nrSignal.csiRsrp.takeIf { it != CellInfo.UNAVAILABLE },
+                rssnr = nrSignal.ssSinr.takeIf { it != CellInfo.UNAVAILABLE }
+                    ?: nrSignal.csiSinr.takeIf { it != CellInfo.UNAVAILABLE },
+                rsrq = nrSignal.ssRsrq.takeIf { it != CellInfo.UNAVAILABLE }
+                    ?: nrSignal.csiRsrq.takeIf { it != CellInfo.UNAVAILABLE }
+            )
+        }
+        return CellularMetrics()
     }
 }
