@@ -12,7 +12,7 @@ class ReadingsDialog(
     private val repository: TripRepository,
     private val collectionName: String,
     private val tripId: String
-) : JDialog(parent, "Leituras da Viagem: $tripId", true) {
+) : JDialog(parent, "Leituras da viagem: $tripId", true) {
 
     private val txtArea = JTextArea("A carregar as leituras...\n")
 
@@ -46,34 +46,32 @@ class ReadingsDialog(
                     if (readings.isEmpty()) {
                         sb.append("Nenhuma leitura encontrada para esta viagem.")
                     } else {
-                        sb.append("TOTAL DE LEITURAS REGISTADAS: ${readings.size}\n\n")
+                        sb.append("Total: ${readings.size}\n\n")
                         readings.forEachIndexed { index, doc ->
                             val dateString = if (doc.timestamp > 0) sdf.format(Date(doc.timestamp)) else "N/D"
 
-                            sb.append("─────────────────────────────────────────────────────────────────\n")
-                            sb.append(" LEITURA #${index + 1} | ID: ${doc.id}\n")
-                            sb.append("─────────────────────────────────────────────────────────────────\n")
-                            sb.append(" Data/Hora (Timestamp)  : $dateString (${doc.timestamp})\n")
-                            sb.append(" Avaliação Subjetiva    : ${if (doc.subjectiveRating >= 0) doc.subjectiveRating else "N/D"}\n")
+                            sb.append(" Leitura Nº #${index + 1} | ID: ${doc.id}\n")
+                            sb.append(" Timestamp: $dateString (${doc.timestamp})\n")
+                            sb.append(" Avaliação subjetiva: ${if (doc.subjectiveRating >= 0) doc.subjectiveRating else "N/D"}\n")
 
                             val locString = if (doc.location != null) "Lat ${doc.location.latitude}, Lng ${doc.location.longitude}" else "N/D"
-                            sb.append(" Localização (GPS)      : $locString\n\n")
+                            sb.append(" Localização: $locString\n\n")
 
                             sb.append(" [ Wi-Fi & Bluetooth ]\n")
-                            sb.append("   Qtd. Dispositivos BT : ${doc.bluetoothCount}\n")
-                            sb.append("   Sinais BT (Top 5)    : ${doc.signalIntensitiesBT}\n")
-                            sb.append("   Qtd. Redes Wi-Fi     : ${doc.wifiCount}\n")
-                            sb.append("   Sinais Wi-Fi (Top 5) : ${doc.signalIntensitiesWF}\n\n")
+                            sb.append("   Qtd. BT: ${doc.bluetoothCount}\n")
+                            sb.append("   Top 5 sinais BT: ${doc.signalIntensitiesBT}\n")
+                            sb.append("   Qtd. Wi-Fi: ${doc.wifiCount}\n")
+                            sb.append("   Top 5 sinais Wi-Fi: ${doc.signalIntensitiesWF}\n\n")
 
-                            sb.append(" [ Desempenho de Rede ]\n")
-                            sb.append("   Latência Média       : ${doc.latencyAvg} ms\n")
-                            sb.append("   Desvio Padrão Lat.   : ${doc.latencyStdDev} ms\n")
-                            sb.append("   Perda de Pacotes     : ${doc.packetLoss} %\n\n")
+                            sb.append(" [ Desempenho de rede ]\n")
+                            sb.append("   Latência média: ${doc.latencyAvg} ms\n")
+                            sb.append("   Desvio padrão da latência: ${doc.latencyStdDev} ms\n")
+                            sb.append("   Perda de pacotes: ${doc.packetLoss} %\n\n")
 
-                            sb.append(" [ Rede Móvel (Celular) ]\n")
-                            sb.append("   RSRP (Potência)      : ${doc.rsrp ?: "N/D"}\n")
-                            sb.append("   RSSNR (Qualidade)    : ${doc.rssnr ?: "N/D"}\n")
-                            sb.append("   RSRQ (Interferência) : ${doc.rsrq ?: "N/D"}\n\n")
+                            sb.append(" [ Sinais de rede móvel ]\n")
+                            sb.append("   RSRP: ${doc.rsrp ?: "N/D"}\n")
+                            sb.append("   RSSNR: ${doc.rssnr ?: "N/D"}\n")
+                            sb.append("   RSRQ: ${doc.rsrq ?: "N/D"}\n\n")
                         }
                     }
                     txtArea.text = sb.toString()

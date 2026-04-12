@@ -18,7 +18,7 @@ class TripCard(
     private fun setupUI() {
         border = BorderFactory.createCompoundBorder(
             EmptyBorder(5, 5, 10, 5),
-            BorderFactory.createTitledBorder("Viagem ID: ${trip.id}")
+            BorderFactory.createTitledBorder("ID da viagem: ${trip.id}")
         )
         maximumSize = Dimension(Int.MAX_VALUE, 120)
 
@@ -30,12 +30,12 @@ class TripCard(
             <html>
                 <table cellpadding='4' style='font-family: SansSerif; font-size: 11px;'>
                     <tr>
-                        <td><b>Data de Início:</b></td><td width='150'>$dateString</td>
+                        <td><b>Data de início:</b></td><td width='150'>$dateString</td>
                         <td><b>Transporte:</b></td><td>${trip.transportType}</td>
                     </tr>
                     <tr>
-                        <td><b>Viagem Válida:</b></td><td>$isValidStr</td>
-                        <td><b>User ID:</b></td><td>${trip.userId}</td>
+                        <td><b>Viagem válida:</b></td><td>$isValidStr</td>
+                        <td><b>ID de utilizador:</b></td><td>${trip.userId}</td>
                     </tr>
                 </table>
             </html>
@@ -43,7 +43,7 @@ class TripCard(
 
         val lblInfo = JLabel(infoText).apply { border = EmptyBorder(5, 10, 5, 10) }
 
-        val btnLeituras = JButton("Ver Leituras").apply {
+        val btnLeituras = JButton("Ver leituras").apply {
             font = Font("SansSerif", Font.BOLD, 12)
             cursor = Cursor.getPredefinedCursor(Cursor.HAND_CURSOR)
             addActionListener { onViewReadingsClicked(trip.id) }

@@ -10,7 +10,7 @@ import javax.swing.*
 import javax.swing.border.EmptyBorder
 import kotlin.concurrent.thread
 
-class MainWindow(private val repository: TripRepository) : JFrame("Visualizador de Viagens OTP-CD") {
+class MainWindow(private val repository: TripRepository) : JFrame("OTP-CD Data Viewer") {
 
     private val exportService = ArffExportService(repository)
 
@@ -74,7 +74,7 @@ class MainWindow(private val repository: TripRepository) : JFrame("Visualizador 
             val fileToSave = fileChooser.selectedFile
 
             btnExportWeka.isEnabled = false
-            btnExportWeka.text = "A Exportar..."
+            btnExportWeka.text = "A exportar..."
 
             thread {
                 try {
@@ -112,7 +112,7 @@ class MainWindow(private val repository: TripRepository) : JFrame("Visualizador 
         btnExportWeka.isEnabled = false
 
         listPanel.removeAll()
-        listPanel.add(JLabel(" A carregar dados e identificar Utilizadores... por favor aguarde."))
+        listPanel.add(JLabel(" A carregar dados..."))
         refreshListPanel()
 
         thread {
