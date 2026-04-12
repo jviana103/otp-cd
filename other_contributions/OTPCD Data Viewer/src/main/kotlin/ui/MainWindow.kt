@@ -1,17 +1,22 @@
 package pt.isel.viewer.ui
 
 import pt.isel.viewer.repository.TripRepository
+import pt.isel.viewer.service.ArffExportService
 import pt.isel.viewer.ui.components.TripCard
 import pt.isel.viewer.ui.dialogs.ReadingsDialog
 import java.awt.*
+import java.io.File
 import javax.swing.*
 import javax.swing.border.EmptyBorder
 import kotlin.concurrent.thread
 
 class MainWindow(private val repository: TripRepository) : JFrame("Visualizador de Viagens OTP-CD") {
 
+    private val exportService = ArffExportService(repository)
+
     private val comboCollections = JComboBox(arrayOf("viagens", "viagens_teste"))
-    private val btnSearch = JButton("Buscar Viagens")
+    private val btnSearch = JButton("Buscar viagens")
+    private val btnExportWeka = JButton("Exportar dados para .arff")
     private val listPanel = JPanel().apply {
         layout = BoxLayout(this, BoxLayout.Y_AXIS)
     }
@@ -19,12 +24,13 @@ class MainWindow(private val repository: TripRepository) : JFrame("Visualizador 
     init {
         setupUI()
         bindEvents()
+
         loadTrips()
     }
 
     private fun setupUI() {
         defaultCloseOperation = EXIT_ON_CLOSE
-        setSize(850, 600)
+        setSize(900, 600)
         layout = BorderLayout()
 
         val topPanel = JPanel(FlowLayout(FlowLayout.LEFT)).apply {
@@ -32,6 +38,10 @@ class MainWindow(private val repository: TripRepository) : JFrame("Visualizador 
             add(JLabel("Coleção:"))
             add(comboCollections)
             add(btnSearch)
+
+            add(Box.createHorizontalStrut(20))
+            btnExportWeka.background = Color(220, 240, 220)
+            add(btnExportWeka)
         }
 
         val scrollPane = JScrollPane(listPanel).apply {
@@ -47,11 +57,59 @@ class MainWindow(private val repository: TripRepository) : JFrame("Visualizador 
     private fun bindEvents() {
         btnSearch.addActionListener { loadTrips() }
         comboCollections.addActionListener { loadTrips() }
+
+        btnExportWeka.addActionListener { handleWekaExport() }
+    }
+
+    private fun handleWekaExport() {
+        val collectionName = comboCollections.selectedItem.toString()
+
+        val fileChooser = JFileChooser()
+        fileChooser.dialogTitle = "Guardar ficheiro ARFF"
+        fileChooser.selectedFile = File("dataset_otpcd_${collectionName}.arff")
+
+        val userSelection = fileChooser.showSaveDialog(this)
+
+        if (userSelection == JFileChooser.APPROVE_OPTION) {
+            val fileToSave = fileChooser.selectedFile
+
+            btnExportWeka.isEnabled = false
+            btnExportWeka.text = "A Exportar..."
+
+            thread {
+                try {
+                    exportService.exportToArff(collectionName, fileToSave)
+
+                    SwingUtilities.invokeLater {
+                        JOptionPane.showMessageDialog(
+                            this@MainWindow,
+                            "Exportação concluída com sucesso para:\n${fileToSave.absolutePath}",
+                            "Sucesso",
+                            JOptionPane.INFORMATION_MESSAGE
+                        )
+                        btnExportWeka.isEnabled = true
+                        btnExportWeka.text = "Exportar dados para ficheiro .arff"
+                    }
+                } catch (e: Exception) {
+                    SwingUtilities.invokeLater {
+                        JOptionPane.showMessageDialog(
+                            this@MainWindow,
+                            "Erro ao exportar dados: ${e.message}",
+                            "Erro",
+                            JOptionPane.ERROR_MESSAGE
+                        )
+                        btnExportWeka.isEnabled = true
+                        btnExportWeka.text = "Exportar dados para ficheiro .arff"
+                    }
+                }
+            }
+        }
     }
 
     private fun loadTrips() {
         val collectionName = comboCollections.selectedItem.toString()
         btnSearch.isEnabled = false
+        btnExportWeka.isEnabled = false
 
         listPanel.removeAll()
         listPanel.add(JLabel(" A carregar dados e identificar Utilizadores... por favor aguarde."))
@@ -79,6 +137,7 @@ class MainWindow(private val repository: TripRepository) : JFrame("Visualizador 
                     }
                     refreshListPanel()
                     btnSearch.isEnabled = true
+                    btnExportWeka.isEnabled = true
                 }
             } catch (e: Exception) {
                 SwingUtilities.invokeLater {
@@ -86,6 +145,7 @@ class MainWindow(private val repository: TripRepository) : JFrame("Visualizador 
                     listPanel.add(JLabel(" Erro ao buscar dados: ${e.message}"))
                     refreshListPanel()
                     btnSearch.isEnabled = true
+                    btnExportWeka.isEnabled = true
                 }
             }
         }
