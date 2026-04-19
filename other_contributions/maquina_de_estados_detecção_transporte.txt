@@ -1,0 +1,27 @@
+
+
+Máquina de estados para detectar se a pessoas está dentro do transporte usando Activity Recognition API e Geofencing API
+
+É preciso também realizar um mapa com as estações de metro e comboio da cidade de Lisboa tanto quanto toda as suas respectivas entradas para ativar a API de geofencing
+
+|Estado exterior
+
+Quando o utilizador estiver com a aplicação aberta em segundo plano em qualquer lugar.
+
+Não há recolha de dados.
+
+|Estado na estação (Aqui pode ter um estado temporário de verificação se a pessoa realmente ficou um tempo na estação)
+
+Quando a API emitir o evento GEOFENCE_TRANSITION_ENTER e o utilizador ficar pelo menos algum tempo dentro da região no estado WALKING ou STILL, realiza a transição para esse estado
+
+A aplicação aguarda o estado da Activity Recognition API passar para IN_VEHICLE
+
+|Estado em trânsito
+
+Quando a Activity Recognition mudar de estado de WALKING ou STILL para IN_VEHICLE
+
+Nesse estado, teríamos a "certeza" de que o utilizador estaria dentro do transporte, e ainda, com o mapeamento correto de geofencing, de qual linha o utilizador estaria. Com isso daria para iniciar a coleta de dados e passar para o backend com o modelo automaticamente.
+
+|Estado "chegou no destino"
+
+Se durante o estado anterior, a API de geofencing emitir GEOFENCE_TRANSITION_ENTER e o activity recognition passar para o estado WALKING ou STILL por tempo suficiente, saberíamos que o utilizador encerrou seu trajeto, e com isso daria para encerrar a coleta de dados. Logo após isso, realiza a transição para o estado exterior.
