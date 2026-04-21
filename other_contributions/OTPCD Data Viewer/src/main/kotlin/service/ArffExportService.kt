@@ -22,6 +22,8 @@ class ArffExportService(private val repository: TripRepository) {
             @ATTRIBUTE timestamp NUMERIC
             @ATTRIBUTE dayOfWeek {1,2,3,4,5,6,7}
             @ATTRIBUTE hour NUMERIC
+            @ATTRIBUTE isWeekend {0,1}
+            @ATTRIBUTE isRushHour {0,1}
             @ATTRIBUTE latitude NUMERIC
             @ATTRIBUTE longitude NUMERIC
             @ATTRIBUTE bluetoothCount NUMERIC
@@ -61,12 +63,18 @@ class ArffExportService(private val repository: TripRepository) {
                 val dayOfWeek = dateTime.dayOfWeek.value
                 val hour = dateTime.hour
 
+                val isWeekend = if (dayOfWeek == 6 || dayOfWeek == 7) 1 else 0
+
+                val isRushHour = if (isWeekend == 0 && (hour in 7..9 || hour in 17..19)) 1 else 0
+
                 val rowValues = listOf(
                     r.userId,
                     trip.transportType.uppercase(),
                     r.timestamp,
                     dayOfWeek,
                     hour,
+                    isWeekend,
+                    isRushHour,
                     r.location?.latitude ?: "?",
                     r.location?.longitude ?: "?",
                     r.bluetoothCount
