@@ -2,6 +2,9 @@ package pt.isel.viewer.service
 
 import pt.isel.viewer.repository.TripRepository
 import java.io.File
+import java.time.Instant
+import java.time.ZoneId
+import java.time.ZonedDateTime
 
 class ArffExportService(private val repository: TripRepository) {
 
@@ -17,6 +20,8 @@ class ArffExportService(private val repository: TripRepository) {
             @ATTRIBUTE userId STRING
             @ATTRIBUTE transportType {METRO,TRAIN}
             @ATTRIBUTE timestamp NUMERIC
+            @ATTRIBUTE dayOfWeek {1,2,3,4,5,6,7}
+            @ATTRIBUTE hour NUMERIC
             @ATTRIBUTE latitude NUMERIC
             @ATTRIBUTE longitude NUMERIC
             @ATTRIBUTE bluetoothCount NUMERIC
@@ -49,10 +54,19 @@ class ArffExportService(private val repository: TripRepository) {
             for (r in readings) {
                 if (r.subjectiveRating !in 1..5) continue
 
+                val dateTime = ZonedDateTime.ofInstant(
+                    Instant.ofEpochMilli(r.timestamp),
+                    ZoneId.systemDefault()
+                )
+                val dayOfWeek = dateTime.dayOfWeek.value
+                val hour = dateTime.hour
+
                 val rowValues = listOf(
                     r.userId,
                     trip.transportType.uppercase(),
                     r.timestamp,
+                    dayOfWeek,
+                    hour,
                     r.location?.latitude ?: "?",
                     r.location?.longitude ?: "?",
                     r.bluetoothCount
